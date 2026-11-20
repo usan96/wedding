@@ -62,6 +62,54 @@ if (typeof galleryDialog?.showModal === "function") {
   });
 }
 
+const directions = document.querySelector(".directions-actions");
+
+if (directions) {
+  const agent = navigator.userAgent;
+  const inApp = /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|; wv\b/i.test(agent);
+  const androidChrome = !inApp && /Android/.test(agent) && /Chrome\//.test(agent);
+  const iosSafari = !inApp && /iPhone|iPad|iPod/.test(agent) && /Version\/.*Safari\//.test(agent);
+  let webFallback;
+
+  function cancelWebFallback() {
+    window.clearTimeout(webFallback);
+  }
+
+  window.addEventListener("pagehide", cancelWebFallback);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) cancelWebFallback();
+  });
+
+  directions.addEventListener("click", (event) => {
+    const anchor = event.target.closest(".directions-link");
+    if (!anchor || event.defaultPrevented || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    cancelWebFallback();
+
+    if (anchor.dataset.naverQuery && (androidChrome || iosSafari)) {
+      const parameters = new URLSearchParams(anchor.dataset.naverQuery);
+      parameters.set("appname", location.origin + location.pathname);
+      const route = `route/car?${parameters}`;
+      event.preventDefault();
+
+      if (androidChrome) {
+        const fallback = encodeURIComponent(anchor.href);
+        location.assign(
+          `intent://${route}#Intent;scheme=nmap;action=android.intent.action.VIEW;` +
+          `category=android.intent.category.BROWSABLE;package=com.nhn.android.nmap;S.browser_fallback_url=${fallback};end`,
+        );
+      } else {
+        webFallback = window.setTimeout(() => {
+          if (!document.hidden) location.assign(anchor.href);
+        }, 1600);
+        location.assign(`nmap://${route}`);
+      }
+    } else if (anchor.dataset.tmapRoute && (androidChrome || iosSafari)) {
+      event.preventDefault();
+      location.assign(anchor.dataset.tmapRoute);
+    }
+  });
+}
+
 const share = document.querySelector(".share");
 const shareButton = share.querySelector(".share-button");
 const status = share.querySelector(".share-status");

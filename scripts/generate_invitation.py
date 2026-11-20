@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Generate the Korean wedding invitation from the repository's input file."""
 
+from __future__ import annotations
+
 import argparse
 import calendar
 import filecmp
@@ -14,9 +16,10 @@ from datetime import date, time
 from html import escape
 from ipaddress import IPv6Address
 from pathlib import Path, PurePosixPath
+from posixpath import normpath
 from string import Template
 from tempfile import NamedTemporaryFile, TemporaryDirectory
-from urllib.parse import quote, urlsplit
+from urllib.parse import quote, unquote, urlencode, urlsplit
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -37,8 +40,11 @@ EXAMPLE_TEXT = {
 }
 INPUT_FIELDS = {
     *REQUIRED_TEXT_FIELDS, *OPTIONAL_TEXT_FIELDS,
-    "status", "date", "time", "directions_url", "cover_photo", "gallery_photos",
+    "status", "date", "time", "directions", "directions_url", "cover_photo", "gallery_photos",
 }
+DIRECTIONS_FIELDS = {"latitude", "longitude", "map_image", "naver_place_url", "tmap_place_url"}
+NAVER_PLACE_HOSTS = {"map.naver.com", "m.map.naver.com", "m.place.naver.com", "naver.me"}
+TMAP_PLACE_HOSTS = {"tmap.life", "poi.tmobiweb.com"}
 
 
 class InputError(ValueError):
@@ -49,6 +55,16 @@ class InputError(ValueError):
 class GalleryPhoto:
     path: Path
     alt: str
+
+
+@dataclass(frozen=True)
+class Directions:
+    latitude: float
+    longitude: float
+    map_image: Path
+    naver_place_url: str
+    tmap_place_url: str
+    tmap_route_url: str
 
 
 @dataclass(frozen=True)
@@ -66,6 +82,7 @@ class Invitation:
     directions_url: str
     cover_photo: Path
     gallery_photos: tuple[GalleryPhoto, ...] = ()
+    directions: Directions | None = None
 
 
 class JsonObject(dict):
@@ -162,7 +179,7 @@ def validate_numeric_host(host):
         raise ValueError
 
 
-def validate_directions_url(value, status):
+def validate_directions_url(value, status, *, location="directions_url"):
     try:
         if any(ch.isspace() or not ch.isprintable() or ch == "\\" for ch in value):
             raise ValueError
@@ -182,11 +199,64 @@ def validate_directions_url(value, status):
         if port == 0 or not host.strip(".") or any(ch in '"<>%^`{|}' for ch in host):
             raise ValueError
     except ValueError as error:
-        raise InputError("directions_url — 유효한 전체 HTTP 또는 HTTPS 주소를 입력해 주세요.") from error
+        raise InputError(f"{location} — 유효한 전체 HTTP 또는 HTTPS 주소를 입력해 주세요.") from error
     host = host.rstrip(".")
     if status == "confirmed" and (host == "example.com" or host.endswith(".example.com")):
-        raise InputError("directions_url — 확정한 예식장의 길찾기 주소를 입력해 주세요.")
+        raise InputError(f"{location} — 확정한 예식장의 길찾기 주소를 입력해 주세요.")
     return value
+
+
+def coordinate(values, field, limit):
+    value = values.get(field)
+    if type(value) not in (int, float) or not -limit <= value <= limit:
+        raise InputError(f"directions.{field} — {-limit}에서 {limit} 사이의 숫자를 입력해 주세요.")
+    return float(value)
+
+
+def place_url(values, field, hosts, status, *, optional=False):
+    location = f"directions.{field}"
+    value = text_field(values, field, optional=optional, location=location)
+    if not value:
+        return ""
+    validate_directions_url(value, status, location=location)
+    url = urlsplit(value)
+    if url.scheme != "https" or url.hostname not in hosts or url.port not in (None, 443):
+        raise InputError(f"{location} — 해당 지도 서비스에서 제공하는 HTTPS 장소 링크를 입력해 주세요.")
+    if status == "confirmed":
+        path = normpath("/" + unquote(url.path).lstrip("/"))
+        if path == "/" or (url.hostname == "map.naver.com" and path == "/p"):
+            raise InputError(f"{location} — 예식장 장소 상세 또는 공유 링크를 입력해 주세요.")
+    return value
+
+
+def load_directions(values, status, venue_name):
+    if "directions" not in values:
+        return None
+    directions = values["directions"]
+    if not isinstance(directions, dict):
+        raise InputError("directions — 지도 설정을 JSON 객체로 입력해 주세요.")
+    check_unique_fields(directions, prefix="directions.")
+    unknown = sorted(directions.keys() - DIRECTIONS_FIELDS)
+    if unknown:
+        fields = ", ".join(f"directions.{field}" for field in unknown)
+        raise InputError(f"{fields} — 사용할 수 없는 항목입니다.")
+
+    latitude = coordinate(directions, "latitude", 90)
+    longitude = coordinate(directions, "longitude", 180)
+    image = text_field(directions, "map_image", location="directions.map_image")
+    map_image = validate_photo(image, status, location="directions.map_image")
+    if not map_image.is_relative_to(ASSETS_DIR) or map_image.suffix.lower() not in {".png", ".webp"}:
+        raise InputError("directions.map_image — assets/ 안의 PNG 또는 WebP 지도를 지정해 주세요.")
+    naver_url = place_url(directions, "naver_place_url", NAVER_PLACE_HOSTS, status)
+    tmap_url = place_url(directions, "tmap_place_url", TMAP_PLACE_HOSTS, status, optional=True)
+    tmap_route_url = ""
+    public_key = os.environ.get("TMAP_PUBLIC_APP_KEY", "").strip()
+    if public_key:
+        parameters = urlencode(dict(
+            appKey=public_key, goalname=venue_name, goalx=longitude, goaly=latitude
+        ))
+        tmap_route_url = f"https://apis.openapi.sk.com/tmap/app/routes?{parameters}"
+    return Directions(latitude, longitude, map_image, naver_url, tmap_url, tmap_route_url)
 
 
 def jpeg_has_image_data(image, size):
@@ -335,7 +405,7 @@ def load_gallery_descriptions(values):
     return descriptions
 
 
-def load_gallery_photos(values, status):
+def load_gallery_photos(values, status, map_image=None):
     descriptions = load_gallery_descriptions(values)
     paths = sorted(
         (
@@ -346,6 +416,8 @@ def load_gallery_photos(values, status):
     )
     photos = []
     for path in paths:
+        if map_image is not None and path.resolve() == map_image:
+            continue
         relative = path.relative_to(ROOT).as_posix()
         photo = validate_photo(relative, status, location=relative)
         photos.append(GalleryPhoto(photo, descriptions.get(relative, "")))
@@ -363,15 +435,20 @@ def load_invitation():
         for field, example in EXAMPLE_TEXT.items():
             if values.get(field, "").strip() == example:
                 raise InputError(f"{field} — 예시 대신 확정한 정보를 입력해 주세요.")
+    directions = load_directions(values, status, required["venue_name"])
+    directions_url = ""
+    if directions is None:
+        directions_url = validate_directions_url(text_field(values, "directions_url"), status)
     return Invitation(
         status=status,
         **required,
         **optional,
         date=parse_date(text_field(values, "date")),
         time=parse_time(text_field(values, "time")),
-        directions_url=validate_directions_url(text_field(values, "directions_url"), status),
+        directions_url=directions_url,
         cover_photo=validate_photo(text_field(values, "cover_photo"), status),
-        gallery_photos=load_gallery_photos(values, status),
+        gallery_photos=load_gallery_photos(values, status, directions.map_image if directions else None),
+        directions=directions,
     )
 
 
@@ -427,7 +504,56 @@ def render_gallery(gallery):
     )
 
 
-def render(invitation, photo_path, gallery):
+def render_directions(invitation, map_path):
+    directions = invitation.directions
+    if directions is None:
+        return f'      <a class="directions-link" href="{escape(invitation.directions_url)}">길찾기</a>\n'
+
+    map_url = escape("./" + quote(map_path.as_posix()))
+    venue = escape(invitation.venue_name)
+    naver_query = escape(urlencode(dict(
+        dlat=directions.latitude, dlng=directions.longitude, dname=invitation.venue_name
+    )))
+    naver_url = escape(directions.naver_place_url)
+    kakao_name = quote(invitation.venue_name, safe="")
+    kakao_url = f"https://map.kakao.com/link/to/{kakao_name},{directions.latitude},{directions.longitude}"
+    tmap_url = escape(directions.tmap_place_url) or "#tmap-help"
+    tmap_route = directions.tmap_route_url
+    tmap_action = f' data-tmap-route="{escape(tmap_route)}"' if tmap_route else ""
+    tmap_help = ""
+    tmap_web = ""
+    if directions.tmap_place_url:
+        tmap_web = f' · <a href="{tmap_url}">T맵 웹에서 보기</a>'
+    if not directions.tmap_place_url:
+        tmap_help = (
+            '        <p id="tmap-help" class="directions-notice" tabindex="-1">'
+            'T맵을 열 수 없으면 위 주소를 복사하거나 다른 지도를 선택해 주세요.</p>\n'
+        )
+    return (
+        '      <section class="directions" aria-labelledby="directions-title">\n'
+        '        <h3 id="directions-title">오시는 길</h3>\n'
+        '        <figure class="venue-map">\n'
+        f'          <img src="{map_url}" alt="{venue} 위치와 주변 도로" decoding="async">\n'
+        '          <figcaption><a href="https://www.openstreetmap.org/copyright">'
+        '© OpenStreetMap contributors</a></figcaption>\n'
+        '        </figure>\n'
+        '        <div class="directions-actions">\n'
+        f'          <a class="directions-link" href="{naver_url}" data-naver-query="{naver_query}">네이버 지도</a>\n'
+        f'          <a class="directions-link" href="{kakao_url}">카카오맵</a>\n'
+        f'          <a class="directions-link" href="{tmap_url}"{tmap_action}>T맵</a>\n'
+        '        </div>\n'
+        f'{tmap_help}'
+        '        <details class="directions-help">\n'
+        '          <summary>길찾기가 안 되나요?</summary>\n'
+        '          <p>지도 앱과 웹 화면이 모두 열리지 않으면 위 예식장 주소를 복사하거나 다른 지도 버튼을 선택해 주세요.</p>\n'
+        f'          <p><a href="{naver_url}">네이버 지도 웹에서 보기</a> · '
+        f'<a href="{kakao_url}">카카오맵 웹에서 보기</a>{tmap_web}</p>\n'
+        '        </details>\n'
+        '      </section>\n'
+    )
+
+
+def render(invitation, photo_path, gallery, map_path=None):
     event_date, event_time = invitation.date, invitation.time
     weekday = "월화수목금토일"[event_date.weekday()] + "요일"
     period = "오전" if event_time.hour < 12 else "오후"
@@ -479,7 +605,7 @@ def render(invitation, photo_path, gallery):
         venue_name=escape(invitation.venue_name),
         venue_address=escape(invitation.venue_address),
         venue_details=venue_details,
-        directions_url=escape(invitation.directions_url),
+        directions_section=render_directions(invitation, map_path),
     )
     try:
         template = Template(TEMPLATE_FILE.read_text(encoding="utf-8"))
@@ -504,6 +630,11 @@ def write_preview(output, page):
 def write_publish_bundle(invitation, output):
     if invitation.status != "confirmed":
         raise InputError("status — 확정 정보와 사진을 대조한 뒤 confirmed로 바꿔 주세요.")
+    directions = invitation.directions
+    if directions is None:
+        raise InputError("directions — 게시 전에 예식장 지도와 길찾기 링크를 입력해 주세요.")
+    if not (directions.tmap_place_url or directions.tmap_route_url):
+        raise InputError("directions.tmap_place_url — 게시 전에 T맵 장소 링크 또는 TMAP_PUBLIC_APP_KEY를 설정해 주세요.")
     if output.exists() or output.is_symlink():
         raise InputError(f"{output} — 아직 존재하지 않는 출력 경로를 지정해 주세요.")
 
@@ -512,7 +643,8 @@ def write_publish_bundle(invitation, output):
         (photo, Path("assets/gallery") / f"{number:03d}{photo.path.suffix.lower()}")
         for number, photo in enumerate(invitation.gallery_photos, start=1)
     ]
-    page = render(invitation, photo_path, gallery)
+    map_path = Path("assets") / f"venue-map{directions.map_image.suffix.lower()}"
+    page = render(invitation, photo_path, gallery, map_path)
     with TemporaryDirectory(prefix=".wedding-", dir=output.parent) as temporary:
         bundle = Path(temporary) / "site"
         (bundle / "assets").mkdir(parents=True)
@@ -520,6 +652,7 @@ def write_publish_bundle(invitation, output):
         for asset in ("styles.css", "invitation.js"):
             shutil.copyfile(ROOT / asset, bundle / asset)
         shutil.copyfile(invitation.cover_photo, bundle / photo_path)
+        shutil.copyfile(directions.map_image, bundle / map_path)
         if gallery:
             (bundle / "assets/gallery").mkdir()
         for photo, output_path in gallery:
@@ -537,7 +670,8 @@ def main():
             output = ROOT / "index.html"
             photo_path = invitation.cover_photo.relative_to(ROOT)
             gallery = [(photo, photo.path.relative_to(ROOT)) for photo in invitation.gallery_photos]
-            write_preview(output, render(invitation, photo_path, gallery))
+            map_path = invitation.directions.map_image.relative_to(ROOT) if invitation.directions else None
+            write_preview(output, render(invitation, photo_path, gallery, map_path))
         else:
             output = args.publish_dir.absolute()
             write_publish_bundle(invitation, output)

@@ -129,7 +129,23 @@
         <div><dt>홀</dt><dd>그레이스 홀</dd></div>
         <div><dt>층</dt><dd>L층</dd></div>
       </dl>
-      <a class="directions-link" href="https://example.com/directions">길찾기</a>
+      <section class="directions" aria-labelledby="directions-title">
+        <h3 id="directions-title">오시는 길</h3>
+        <figure class="venue-map">
+          <img src="./assets/venue-map.png" alt="더블유스퀘어컨벤션 위치와 주변 도로" decoding="async">
+          <figcaption><a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a></figcaption>
+        </figure>
+        <div class="directions-actions">
+          <a class="directions-link" href="https://map.naver.com/p/entry/place/36301790" data-naver-query="dlat=37.4006298&amp;dlng=127.1114621&amp;dname=%EB%8D%94%EB%B8%94%EC%9C%A0%EC%8A%A4%ED%80%98%EC%96%B4%EC%BB%A8%EB%B2%A4%EC%85%98">네이버 지도</a>
+          <a class="directions-link" href="https://map.kakao.com/link/to/%EB%8D%94%EB%B8%94%EC%9C%A0%EC%8A%A4%ED%80%98%EC%96%B4%EC%BB%A8%EB%B2%A4%EC%85%98,37.4006298,127.1114621">카카오맵</a>
+          <a class="directions-link" href="https://tmap.life/0ffb7f67">T맵</a>
+        </div>
+        <details class="directions-help">
+          <summary>길찾기가 안 되나요?</summary>
+          <p>지도 앱과 웹 화면이 모두 열리지 않으면 위 예식장 주소를 복사하거나 다른 지도 버튼을 선택해 주세요.</p>
+          <p><a href="https://map.naver.com/p/entry/place/36301790">네이버 지도 웹에서 보기</a> · <a href="https://map.kakao.com/link/to/%EB%8D%94%EB%B8%94%EC%9C%A0%EC%8A%A4%ED%80%98%EC%96%B4%EC%BB%A8%EB%B2%A4%EC%85%98,37.4006298,127.1114621">카카오맵 웹에서 보기</a> · <a href="https://tmap.life/0ffb7f67">T맵 웹에서 보기</a></p>
+        </details>
+      </section>
     </section>
 
     <section class="section thanks" aria-labelledby="thanks-title">

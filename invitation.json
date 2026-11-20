@@ -8,7 +8,13 @@
   "venue_address": "경기도 성남시 분당구 판교역로226번길 16",
   "venue_hall": "그레이스 홀",
   "venue_floor": "L층",
-  "directions_url": "https://example.com/directions",
+  "directions": {
+    "latitude": 37.4006298,
+    "longitude": 127.1114621,
+    "map_image": "assets/venue-map.png",
+    "naver_place_url": "https://map.naver.com/p/entry/place/36301790",
+    "tmap_place_url": "https://tmap.life/0ffb7f67"
+  },
   "cover_photo": "assets/HE_01466-1.jpg",
   "cover_photo_alt": "커버 사진"
 }

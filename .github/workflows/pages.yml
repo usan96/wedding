@@ -24,6 +24,8 @@ jobs:
         with:
           python-version: '3.11'
       - name: Prepare invitation files
+        env:
+          TMAP_PUBLIC_APP_KEY: ${{ vars.TMAP_PUBLIC_APP_KEY }}
         run: python scripts/generate_invitation.py --publish-dir _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4

@@ -370,6 +370,66 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   outline-offset: 3px;
 }
 
+.directions {
+  max-width: 22rem;
+  margin: 2.5rem auto 0;
+}
+
+.directions h3 {
+  margin: 0 0 1rem;
+  font-family: var(--serif);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.venue-map img {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: .375rem;
+}
+
+.venue-map figcaption {
+  margin-top: .375rem;
+  text-align: right;
+  font-size: .6875rem;
+  line-height: 1.5;
+}
+
+.venue-map a,
+.directions-help a {
+  color: var(--olive);
+  text-underline-offset: .2em;
+}
+
+.directions-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-top: 1rem;
+}
+
+.directions-actions .directions-link {
+  flex: 1 1 4.5rem;
+  min-width: 44px;
+  min-height: max(44px, 2.75rem);
+  margin: 0;
+  padding-inline: .35rem;
+  font-size: .875rem;
+}
+
+.directions-notice,
+.directions-help {
+  margin-top: .75rem;
+  font-size: .8125rem;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.directions-notice:not(:target) { display: none; }
+.directions-help summary { cursor: pointer; }
+.directions-help p { margin-top: .375rem; }
+
 .thanks {
   padding-top: 5.5rem;
   padding-bottom: 5.75rem;
