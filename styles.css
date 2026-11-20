@@ -162,6 +162,23 @@ h1, h2, p, figure, dl, dd { margin: 0; }
 .greeting-message { margin-top: 2.875rem; }
 .greeting-message p + p { margin-top: .75rem; }
 
+.gallery {
+  padding-bottom: 1.5rem;
+}
+
+.gallery-photos {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.gallery-photos img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .schedule { padding-top: 2.5rem; }
 
 .event-date { margin-top: 1rem; }

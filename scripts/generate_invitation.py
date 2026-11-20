@@ -36,12 +36,18 @@ EXAMPLE_TEXT = {
 }
 INPUT_FIELDS = {
     *REQUIRED_TEXT_FIELDS, *OPTIONAL_TEXT_FIELDS,
-    "status", "date", "time", "directions_url", "cover_photo",
+    "status", "date", "time", "directions_url", "cover_photo", "gallery_photos",
 }
 
 
 class InputError(ValueError):
     """An input file or field needs correction."""
+
+
+@dataclass(frozen=True)
+class GalleryPhoto:
+    path: Path
+    alt: str
 
 
 @dataclass(frozen=True)
@@ -58,20 +64,29 @@ class Invitation:
     time: time
     directions_url: str
     cover_photo: Path
+    gallery_photos: tuple[GalleryPhoto, ...] = ()
 
 
-def unique_fields(pairs):
-    values = {}
-    for field, value in pairs:
-        if field in values:
-            raise InputError(f"{field} — 같은 항목이 두 번 입력되었습니다.")
-        values[field] = value
-    return values
+class JsonObject(dict):
+    """Keep the first duplicate key until validation knows the object's location."""
+
+    def __init__(self, pairs):
+        super().__init__()
+        self.duplicate_field = None
+        for field, value in pairs:
+            if field in self and self.duplicate_field is None:
+                self.duplicate_field = field
+            self[field] = value
+
+
+def check_unique_fields(values, prefix=""):
+    if isinstance(values, JsonObject) and values.duplicate_field is not None:
+        raise InputError(f"{prefix}{values.duplicate_field} — 같은 항목이 두 번 입력되었습니다.")
 
 
 def read_fields():
     try:
-        values = json.loads(INPUT_FILE.read_text(encoding="utf-8"), object_pairs_hook=unique_fields)
+        values = json.loads(INPUT_FILE.read_text(encoding="utf-8"), object_pairs_hook=JsonObject)
     except json.JSONDecodeError as error:
         raise InputError(
             f"{INPUT_FILE.name} — {error.lineno}행 {error.colno}열의 JSON 형식을 확인해 주세요."
@@ -80,26 +95,28 @@ def read_fields():
         raise InputError(f"{INPUT_FILE.name} — UTF-8로 저장해 주세요.") from error
     if not isinstance(values, dict):
         raise InputError(f"{INPUT_FILE.name} — 항목을 JSON 객체 하나로 입력해 주세요.")
+    check_unique_fields(values)
     unknown = sorted(values.keys() - INPUT_FIELDS)
     if unknown:
         raise InputError(f"{', '.join(unknown)} — 사용할 수 없는 항목입니다.")
     return values
 
 
-def text_field(values, field, *, optional=False):
+def text_field(values, field, *, optional=False, location=None):
+    location = location or field
     if field not in values:
         if optional:
             return ""
-        raise InputError(f"{field} — 필수 항목이 빠졌습니다.")
+        raise InputError(f"{location} — 필수 항목이 빠졌습니다.")
     value = values[field]
     if not isinstance(value, str):
-        raise InputError(f"{field} — 큰따옴표로 감싼 문자열을 입력해 주세요.")
+        raise InputError(f"{location} — 큰따옴표로 감싼 문자열을 입력해 주세요.")
     if not optional and not value.strip():
-        raise InputError(f"{field} — 값을 입력해 주세요.")
+        raise InputError(f"{location} — 값을 입력해 주세요.")
     try:
         value.encode("utf-8")
     except UnicodeEncodeError as error:
-        raise InputError(f"{field} — 올바른 문자를 입력해 주세요.") from error
+        raise InputError(f"{location} — 올바른 문자를 입력해 주세요.") from error
     return value if value.strip() else ""
 
 
@@ -267,29 +284,55 @@ def matches_photo_format(photo):
         return riff_end <= size and webp_has_frame(image, riff_end)
 
 
-def validate_photo(value, status):
+def is_sample_photo(photo):
+    return SAMPLE_PHOTO.is_file() and filecmp.cmp(photo, SAMPLE_PHOTO, shallow=False)
+
+
+def validate_photo(value, status, *, location="cover_photo"):
     relative = PurePosixPath(value)
     if relative.is_absolute() or ".." in relative.parts or "\\" in value or "\x00" in value:
-        raise InputError("cover_photo — 저장소에 있는 사진을 상대 경로로 입력해 주세요.")
+        raise InputError(f"{location} — 저장소에 있는 사진을 상대 경로로 입력해 주세요.")
     try:
         photo = ROOT.joinpath(*relative.parts).resolve()
     except (OSError, RuntimeError) as error:
-        raise InputError("cover_photo — 사진 경로를 확인해 주세요.") from error
+        raise InputError(f"{location} — 사진 경로를 확인해 주세요.") from error
     if photo != SAMPLE_PHOTO and (
         not photo.is_relative_to(ROOT / "assets") or photo.suffix.lower() not in PHOTO_EXTENSIONS
     ):
-        raise InputError("cover_photo — assets/ 안의 JPG, JPEG, PNG, WebP 사진을 지정해 주세요.")
+        raise InputError(f"{location} — assets/ 안의 JPG, JPEG, PNG, WebP 사진을 지정해 주세요.")
     if not photo.is_file():
-        raise InputError("cover_photo — 지정한 사진 파일을 찾을 수 없습니다.")
+        raise InputError(f"{location} — 지정한 사진 파일을 찾을 수 없습니다.")
     try:
         valid_format = matches_photo_format(photo)
     except OSError as error:
-        raise InputError("cover_photo — 지정한 사진 파일을 읽을 수 없습니다.") from error
+        raise InputError(f"{location} — 지정한 사진 파일을 읽을 수 없습니다.") from error
     if not valid_format:
-        raise InputError("cover_photo — 파일 내용이 확장자에 맞는 JPG, JPEG, PNG, WebP 이미지인지 확인해 주세요.")
-    if status == "confirmed" and SAMPLE_PHOTO.is_file() and filecmp.cmp(photo, SAMPLE_PHOTO, shallow=False):
-        raise InputError("cover_photo — 기본 예시 사진 대신 확정 사진을 지정해 주세요.")
+        raise InputError(f"{location} — 파일 내용이 확장자에 맞는 JPG, JPEG, PNG, WebP 이미지인지 확인해 주세요.")
+    if status == "confirmed" and is_sample_photo(photo):
+        raise InputError(f"{location} — 기본 예시 사진 대신 확정 사진을 지정해 주세요.")
     return photo
+
+
+def load_gallery_photos(values, status):
+    entries = values.get("gallery_photos", [])
+    if not isinstance(entries, list):
+        raise InputError("gallery_photos — 사진 항목을 배열로 입력해 주세요.")
+
+    photos = []
+    for index, entry in enumerate(entries):
+        location = f"gallery_photos[{index}]"
+        if not isinstance(entry, dict):
+            raise InputError(f"{location} — 사진 항목을 JSON 객체로 입력해 주세요.")
+        check_unique_fields(entry, prefix=f"{location}.")
+        unknown = sorted(entry.keys() - {"path", "alt"})
+        if unknown:
+            raise InputError(f"{location} — 사용할 수 없는 항목입니다. {', '.join(unknown)}")
+        path_location = f"{location}.path"
+        path_value = text_field(entry, "path", location=path_location)
+        path = validate_photo(path_value, status, location=path_location)
+        alt = text_field(entry, "alt", optional=True, location=f"{location}.alt")
+        photos.append(GalleryPhoto(path, alt))
+    return tuple(photos)
 
 
 def load_invitation():
@@ -311,6 +354,7 @@ def load_invitation():
         time=parse_time(text_field(values, "time")),
         directions_url=validate_directions_url(text_field(values, "directions_url"), status),
         cover_photo=validate_photo(text_field(values, "cover_photo"), status),
+        gallery_photos=load_gallery_photos(values, status),
     )
 
 
@@ -332,7 +376,26 @@ def calendar_rows(event_date):
     return "".join(rows)
 
 
-def render(invitation, photo_path):
+def render_gallery(gallery):
+    if not gallery:
+        return ""
+
+    images = []
+    for number, (photo, output_path) in enumerate(gallery, start=1):
+        url = escape("./" + quote(output_path.as_posix()))
+        alt = escape(photo.alt or f"웨딩 사진 {number}")
+        images.append(f'        <img src="{url}" alt="{alt}" loading="lazy">\n')
+    return (
+        '    <section class="section gallery" aria-labelledby="gallery-title">\n'
+        '      <h2 id="gallery-title">사진</h2>\n'
+        '      <div class="gallery-photos">\n'
+        + "".join(images)
+        + '      </div>\n'
+        '    </section>\n\n'
+    )
+
+
+def render(invitation, photo_path, gallery):
     event_date, event_time = invitation.date, invitation.time
     weekday = "월화수목금토일"[event_date.weekday()] + "요일"
     period = "오전" if event_time.hour < 12 else "오후"
@@ -348,9 +411,12 @@ def render(invitation, photo_path):
     if draft:
         title += " 초안"
         note = "청첩장 초안"
-        if all(getattr(invitation, field).strip() == EXAMPLE_TEXT[field] for field in REQUIRED_TEXT_FIELDS):
+        example_info = all(
+            getattr(invitation, field).strip() == EXAMPLE_TEXT[field] for field in REQUIRED_TEXT_FIELDS
+        )
+        if example_info:
             note += " · 예식 일시와 장소 등 예시 정보가 포함되어 있습니다."
-        elif sample:
+        if (sample and not example_info) or any(is_sample_photo(photo.path) for photo in invitation.gallery_photos):
             note += " · 예시 사진이 포함되어 있습니다."
         draft_note = f'      <p class="draft-note">{note}</p>\n\n'
     venue_details = "".join(
@@ -377,6 +443,7 @@ def render(invitation, photo_path):
         event_time=display_time,
         calendar_month=f"{event_date.year}년 {event_date.month}월",
         calendar_rows=calendar_rows(event_date),
+        gallery=render_gallery(gallery),
         venue_name=escape(invitation.venue_name),
         venue_address=escape(invitation.venue_address),
         venue_details=venue_details,
@@ -409,7 +476,11 @@ def write_publish_bundle(invitation, output):
         raise InputError(f"{output} — 아직 존재하지 않는 출력 경로를 지정해 주세요.")
 
     photo_path = Path("assets") / f"cover{invitation.cover_photo.suffix.lower()}"
-    page = render(invitation, photo_path)
+    gallery = [
+        (photo, Path("assets/gallery") / f"{number:03d}{photo.path.suffix.lower()}")
+        for number, photo in enumerate(invitation.gallery_photos, start=1)
+    ]
+    page = render(invitation, photo_path, gallery)
     with TemporaryDirectory(prefix=".wedding-", dir=output.parent) as temporary:
         bundle = Path(temporary) / "site"
         (bundle / "assets").mkdir(parents=True)
@@ -417,6 +488,10 @@ def write_publish_bundle(invitation, output):
         for asset in ("styles.css", "invitation.js"):
             shutil.copyfile(ROOT / asset, bundle / asset)
         shutil.copyfile(invitation.cover_photo, bundle / photo_path)
+        if gallery:
+            (bundle / "assets/gallery").mkdir()
+        for photo, output_path in gallery:
+            shutil.copyfile(photo.path, bundle / output_path)
         bundle.rename(output)
 
 
@@ -429,7 +504,8 @@ def main():
         if args.publish_dir is None:
             output = ROOT / "index.html"
             photo_path = invitation.cover_photo.relative_to(ROOT)
-            write_preview(output, render(invitation, photo_path))
+            gallery = [(photo, photo.path.relative_to(ROOT)) for photo in invitation.gallery_photos]
+            write_preview(output, render(invitation, photo_path, gallery))
         else:
             output = args.publish_dir.absolute()
             write_publish_bundle(invitation, output)
