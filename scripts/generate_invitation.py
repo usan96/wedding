@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parent.parent
 INPUT_FILE = ROOT / "invitation.json"
 TEMPLATE_FILE = ROOT / "templates" / "invitation.html"
 SAMPLE_PHOTO = ROOT / "sample.png"
+ASSETS_DIR = ROOT / "assets"
 PHOTO_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 REQUIRED_TEXT_FIELDS = ("groom_name", "bride_name", "venue_name", "venue_address")
 OPTIONAL_TEXT_FIELDS = ("venue_hall", "venue_floor", "cover_photo_alt")
@@ -297,7 +298,7 @@ def validate_photo(value, status, *, location="cover_photo"):
     except (OSError, RuntimeError) as error:
         raise InputError(f"{location} — 사진 경로를 확인해 주세요.") from error
     if photo != SAMPLE_PHOTO and (
-        not photo.is_relative_to(ROOT / "assets") or photo.suffix.lower() not in PHOTO_EXTENSIONS
+        not photo.is_relative_to(ASSETS_DIR) or photo.suffix.lower() not in PHOTO_EXTENSIONS
     ):
         raise InputError(f"{location} — assets/ 안의 JPG, JPEG, PNG, WebP 사진을 지정해 주세요.")
     if not photo.is_file():
@@ -313,12 +314,13 @@ def validate_photo(value, status, *, location="cover_photo"):
     return photo
 
 
-def load_gallery_photos(values, status):
+def load_gallery_descriptions(values):
+    """Read optional descriptions from the former explicit photo list."""
     entries = values.get("gallery_photos", [])
     if not isinstance(entries, list):
         raise InputError("gallery_photos — 사진 항목을 배열로 입력해 주세요.")
 
-    photos = []
+    descriptions = {}
     for index, entry in enumerate(entries):
         location = f"gallery_photos[{index}]"
         if not isinstance(entry, dict):
@@ -327,11 +329,26 @@ def load_gallery_photos(values, status):
         unknown = sorted(entry.keys() - {"path", "alt"})
         if unknown:
             raise InputError(f"{location} — 사용할 수 없는 항목입니다. {', '.join(unknown)}")
-        path_location = f"{location}.path"
-        path_value = text_field(entry, "path", location=path_location)
-        path = validate_photo(path_value, status, location=path_location)
+        path = PurePosixPath(text_field(entry, "path", location=f"{location}.path"))
         alt = text_field(entry, "alt", optional=True, location=f"{location}.alt")
-        photos.append(GalleryPhoto(path, alt))
+        descriptions[path.as_posix()] = alt
+    return descriptions
+
+
+def load_gallery_photos(values, status):
+    descriptions = load_gallery_descriptions(values)
+    paths = sorted(
+        (
+            path for path in ASSETS_DIR.rglob("*")
+            if path.suffix.lower() in PHOTO_EXTENSIONS and path.is_file()
+        ),
+        key=lambda path: (path.name.casefold(), path.relative_to(ASSETS_DIR).as_posix()),
+    )
+    photos = []
+    for path in paths:
+        relative = path.relative_to(ROOT).as_posix()
+        photo = validate_photo(relative, status, location=relative)
+        photos.append(GalleryPhoto(photo, descriptions.get(relative, "")))
     return tuple(photos)
 
 
@@ -384,13 +401,28 @@ def render_gallery(gallery):
     for number, (photo, output_path) in enumerate(gallery, start=1):
         url = escape("./" + quote(output_path.as_posix()))
         alt = escape(photo.alt or f"웨딩 사진 {number}")
-        images.append(f'        <img src="{url}" alt="{alt}" loading="lazy">\n')
+        images.append(
+            f'        <a class="gallery-photo" href="{url}">\n'
+            f'          <img src="{url}" alt="{alt}" loading="lazy">\n'
+            '        </a>\n'
+        )
     return (
         '    <section class="section gallery" aria-labelledby="gallery-title">\n'
         '      <h2 id="gallery-title">사진</h2>\n'
         '      <div class="gallery-photos">\n'
         + "".join(images)
         + '      </div>\n'
+        '      <dialog class="gallery-dialog" aria-label="웨딩 사진 크게 보기">\n'
+        '        <div class="gallery-dialog-content">\n'
+        '          <button class="gallery-close" type="button" aria-label="사진 닫기" autofocus>×</button>\n'
+        '          <img class="gallery-full-photo" alt="">\n'
+        '          <div class="gallery-controls">\n'
+        '            <button type="button" data-gallery-step="-1" aria-label="이전 사진">‹</button>\n'
+        '            <p class="gallery-position" role="status"></p>\n'
+        '            <button type="button" data-gallery-step="1" aria-label="다음 사진">›</button>\n'
+        '          </div>\n'
+        '        </div>\n'
+        '      </dialog>\n'
         '    </section>\n\n'
     )
 

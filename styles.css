@@ -168,16 +168,120 @@ h1, h2, p, figure, dl, dd { margin: 0; }
 
 .gallery-photos {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: clamp(3.75rem, 21vw, 5.75rem);
+  gap: .375rem;
   margin-top: 1.5rem;
 }
 
-.gallery-photos img {
+.gallery-photo {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: .5rem;
+  background: var(--cover);
+}
+
+.gallery-photo[hidden] { display: none; }
+
+.gallery-photo:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.gallery-photo:only-child { grid-column: 1 / -1; }
+.gallery-photo:first-child:nth-last-child(2) + .gallery-photo {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.gallery-photo:first-child:nth-last-child(3) ~ .gallery-photo,
+.gallery-photo:first-child:nth-last-child(4) ~ .gallery-photo:last-child {
+  grid-column: span 2;
+}
+
+.gallery-photo img {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
 }
+
+.gallery-photo:focus-visible,
+.gallery-dialog button:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+.gallery-more {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #22271cb5;
+  color: white;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.gallery-dialog {
+  width: min(calc(100% - 1rem), 50rem);
+  max-height: calc(100% - 1rem);
+  padding: .625rem;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--paper);
+  color: var(--ink);
+  text-align: center;
+}
+
+.gallery-dialog::backdrop { background: #1c2016d9; }
+.gallery-dialog:not([open]) { display: none; }
+
+body:has(.gallery-dialog[open]) { overflow: hidden; }
+
+.gallery-dialog-content {
+  display: grid;
+  gap: .5rem;
+}
+
+.gallery-close { justify-self: end; }
+
+.gallery-dialog button {
+  display: grid;
+  width: 2.75rem;
+  min-height: 2.75rem;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--olive);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gallery-full-photo {
+  display: block;
+  width: 100%;
+  height: min(65vh, 42rem);
+  height: min(65dvh, 42rem);
+  border-radius: .5rem;
+  background: var(--cover);
+  object-fit: contain;
+}
+
+.gallery-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.gallery-controls[hidden] { display: none; }
+.gallery-position { font-variant-numeric: tabular-nums; }
 
 .schedule { padding-top: 2.5rem; }
 
