@@ -20,17 +20,11 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.11'
       - name: Prepare invitation files
-        run: |
-          if grep -Eq 'data-draft|sample[.]png' index.html; then
-            echo "::error::Update the draft with confirmed wedding details and a final photo before publishing."
-            exit 1
-          fi
-          mkdir _site
-          cp index.html styles.css invitation.js _site/
-          if [ -d assets ]; then
-            cp -R assets _site/
-          fi
+        run: python scripts/generate_invitation.py --publish-dir _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

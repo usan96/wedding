@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+$robots  <meta name="theme-color" content="#f8f6f0">
+  <title>$page_title</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./invitation.js" defer></script>
+</head>
+<body>
+  <main class="invitation"$draft_attribute>
+    <header class="cover">
+$draft_note      <figure class="portrait$sample_class">
+        <div class="portrait-window">
+          <img src="$photo_url" alt="$photo_alt"$sample_dimensions>
+        </div>
+      </figure>
+
+      <div class="cover-details">
+        <h1 class="cover-names"><span>$groom_name</span> <span>$bride_name</span></h1>
+        <div class="cover-copy">
+          <p class="cover-message">아름다운 날,<br>첫 시작을 축복해 주세요</p>
+          <p class="cover-date"><time datetime="$event_datetime">$cover_date<br>$event_time</time></p>
+          <p class="cover-venue">$venue_name</p>
+        </div>
+      </div>
+    </header>
+
+    <section class="section greeting" aria-labelledby="greeting-title">
+      <h2 id="greeting-title">초대합니다</h2>
+      <p class="greeting-names">$groom_name <span aria-hidden="true">♥</span> $bride_name</p>
+      <div class="greeting-message">
+        <p>서로의 일상에 가장 다정한 사람이 되어<br>
+          이제 같은 길을 걸으려 합니다.</p>
+        <p>저희의 첫걸음을 함께 축복해 주시면<br>
+          더없이 기쁘겠습니다.</p>
+      </div>
+    </section>
+
+    <section class="section schedule" aria-labelledby="schedule-title">
+      <h2 id="schedule-title">예식 일정</h2>
+      <p class="event-date"><time datetime="$event_datetime">$schedule_date</time></p>
+      <div class="calendar-card">
+        <table class="calendar">
+          <caption>$calendar_month</caption>
+          <thead>
+            <tr>
+              <th scope="col">일</th><th scope="col">월</th><th scope="col">화</th><th scope="col">수</th>
+              <th scope="col">목</th><th scope="col">금</th><th scope="col">토</th>
+            </tr>
+          </thead>
+          <tbody>
+$calendar_rows          </tbody>
+        </table>
+      </div>
+
+      <dl class="venue">
+        <div><dt>예식 시각</dt><dd>$event_time</dd></div>
+        <div><dt>예식 장소</dt><dd>$venue_name</dd></div>
+        <div><dt>주소</dt><dd>$venue_address</dd></div>
+$venue_details      </dl>
+      <a class="directions-link" href="$directions_url">길찾기</a>
+    </section>
+
+    <section class="section thanks" aria-labelledby="thanks-title">
+      <h2 id="thanks-title">축하의 마음</h2>
+      <p>저희의 시작을 따뜻하게 지켜봐 주셔서 감사합니다.<br>
+        보내주신 축복을 오래도록 마음에 간직하겠습니다.</p>
+    </section>
+
+    <footer class="share" hidden>
+      <button type="button" class="share-button">
+        <span class="share-icon" aria-hidden="true"></span>
+        청첩장 공유하기
+      </button>
+      <p class="share-status" role="status"></p>
+      <label class="share-link" hidden>
+        청첩장 주소
+        <input type="text" readonly>
+      </label>
+    </footer>
+  </main>
+</body>
+</html>

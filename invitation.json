@@ -1,0 +1,14 @@
+{
+  "status": "draft",
+  "groom_name": "예시 신랑",
+  "bride_name": "예시 신부",
+  "date": "2027-03-13",
+  "time": "14:30",
+  "venue_name": "예시 웨딩홀",
+  "venue_address": "예시 주소",
+  "venue_hall": "예시 홀",
+  "venue_floor": "2층",
+  "directions_url": "https://example.com/directions",
+  "cover_photo": "sample.png",
+  "cover_photo_alt": "예시 웨딩 사진"
+}
