@@ -602,7 +602,7 @@ def render_directions(invitation, map_path):
         f'              data-latitude="{directions.latitude}" data-longitude="{directions.longitude}"'
         f'{naver_map_attribute}></div>\n'
         '          </div>\n'
-        '          <p class="venue-map-hint">두 손가락으로 지도를 움직이거나 확대·축소할 수 있어요.</p>\n'
+        '          <p class="venue-map-hint">한 손가락으로 지도를 움직이고, 두 손가락으로 확대·축소할 수 있어요.</p>\n'
         '          <figcaption><a href="https://www.openstreetmap.org/copyright">'
         '© OpenStreetMap contributors</a></figcaption>\n'
         '        </figure>\n'

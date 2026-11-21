@@ -67,7 +67,6 @@ const venueMap = document.querySelector(".venue-map-interactive");
 if (venueMap && /^https?:$/.test(location.protocol)) {
   const { latitude, longitude, venue, naverClientId } = venueMap.dataset;
   const center = [Number(latitude), Number(longitude)];
-  const touchScreen = matchMedia("(pointer: coarse)").matches;
   const figure = venueMap.closest(".venue-map");
 
   function showVenueMap(provider) {
@@ -83,7 +82,6 @@ if (venueMap && /^https?:$/.test(location.protocol)) {
       attributionControl: false,
       zoomControl: false,
       scrollWheelZoom: false,
-      dragging: !touchScreen,
     }).setView(center, 16);
 
     leaflet.control.zoom({ zoomInTitle: "확대", zoomOutTitle: "축소" }).addTo(map);
@@ -143,9 +141,8 @@ if (venueMap && /^https?:$/.test(location.protocol)) {
         map = new maps.Map(container, {
           center: position,
           zoom: 16,
-          zoomControl: true,
+          zoomControl: false,
           scrollWheel: false,
-          draggable: !touchScreen,
         });
         new maps.Marker({ map, position, title: venue });
         maps.Event.once(map, "tilesloaded", () => {

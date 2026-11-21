@@ -387,7 +387,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 .venue-map-naver {
   width: 100%;
   height: 100%;
-  touch-action: pan-y;
+  touch-action: none;
 }
 
 .venue-map.is-interactive .venue-map-interactive { visibility: visible; }
@@ -404,7 +404,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 .venue-map-hint { display: none; }
 
 @media (pointer: coarse) {
-  .venue-map[data-map-provider="openstreetmap"] .venue-map-hint {
+  .venue-map.is-interactive .venue-map-hint {
     display: block;
     margin-top: .375rem;
     color: var(--muted);
