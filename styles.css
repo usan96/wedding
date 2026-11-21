@@ -65,7 +65,7 @@ h1, h2, p, figure, dl, dd { margin: 0; }
   font-family: var(--serif);
   font-size: clamp(1.25rem, 6vw, 1.625rem);
   font-weight: 500;
-  letter-spacing: .12em;
+  letter-spacing: .06em;
   line-height: 1.35;
 }
 
@@ -117,7 +117,7 @@ h1, h2, p, figure, dl, dd { margin: 0; }
 
 .cover-venue {
   margin-top: .125rem;
-  color: var(--muted);
+  color: var(--olive);
   font-size: .875rem;
   line-height: 1.5;
 }
