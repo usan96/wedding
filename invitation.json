@@ -25,8 +25,9 @@
   "venue_address": "경기도 성남시 분당구 판교역로226번길 16",
   "venue_hall": "그레이스 홀",
   "venue_floor": "L층",
-  "parking": "주차 2시간 무료, 이후 10분당 1,000원",
-  "shuttle": "판교역 7번 출구 10분마다",
+  "parking": "웨딩홀 2시간 무료주차인근 주차타워(삼환하이펙스 B동) 무료주차(주차요원 안내 예정)",
+  "shuttle": "판교역 1번 출구 앞\n약 10분 간격 수시운행",
+  "shuttle_photo": "assets/shuttle-stop.jpg",
   "directions": {
     "latitude": 37.4006298,
     "longitude": 127.1114621,

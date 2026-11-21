@@ -46,7 +46,7 @@ EXAMPLE_TEXT = {
 INPUT_FIELDS = {
     *REQUIRED_TEXT_FIELDS, *OPTIONAL_TEXT_FIELDS,
     "status", "date", "time", "directions", "directions_url", "cover_photo", "gallery_photos",
-    "background_color", "groom_account", "bride_account",
+    "background_color", "groom_account", "bride_account", "shuttle_photo",
 }
 ACCOUNT_FIELDS = ("bank", "number", "holder")
 DIRECTIONS_FIELDS = {"latitude", "longitude", "map_image", "naver_place_url", "tmap_place_url"}
@@ -113,6 +113,7 @@ class Invitation:
     bride_phone: str = ""
     groom_account: Account | None = None
     bride_account: Account | None = None
+    shuttle_photo: Path | None = None
 
 
 class JsonObject(dict):
@@ -435,7 +436,7 @@ def load_gallery_descriptions(values):
     return descriptions
 
 
-def load_gallery_photos(values, status, map_image=None):
+def load_gallery_photos(values, status, map_image=None, shuttle_photo=None):
     descriptions = load_gallery_descriptions(values)
     paths = sorted(
         (
@@ -445,8 +446,9 @@ def load_gallery_photos(values, status, map_image=None):
         key=lambda path: (path.name.casefold(), path.relative_to(ASSETS_DIR).as_posix()),
     )
     photos = []
+    excluded = {map_image, shuttle_photo}
     for path in paths:
-        if map_image is not None and path.resolve() == map_image:
+        if path.resolve() in excluded:
             continue
         relative = path.relative_to(ROOT).as_posix()
         photo = validate_photo(relative, status, location=relative)
@@ -495,6 +497,10 @@ def load_invitation():
     directions_url = ""
     if directions is None:
         directions_url = validate_directions_url(text_field(values, "directions_url"), status)
+    shuttle_photo_value = text_field(values, "shuttle_photo", optional=True).strip()
+    shuttle_photo = (
+        validate_photo(shuttle_photo_value, status, location="shuttle_photo") if shuttle_photo_value else None
+    )
     return Invitation(
         status=status,
         **required,
@@ -506,8 +512,9 @@ def load_invitation():
         time=parse_time(text_field(values, "time")),
         directions_url=directions_url,
         cover_photo=validate_photo(text_field(values, "cover_photo"), status),
-        gallery_photos=load_gallery_photos(values, status, directions.map_image if directions else None),
+        gallery_photos=load_gallery_photos(values, status, directions.map_image if directions else None, shuttle_photo),
         directions=directions,
+        shuttle_photo=shuttle_photo,
     )
 
 
@@ -630,12 +637,26 @@ def render_parents(invitation):
     return '      <div class="family">\n' + "".join(lines) + '      </div>\n'
 
 
-def render_transport(invitation):
-    entries = [
-        f"        <div><dt>{label}</dt><dd>{escape(value.strip())}</dd></div>\n"
-        for label, value in (("주차", invitation.parking), ("셔틀", invitation.shuttle))
-        if value.strip()
-    ]
+def render_transport(invitation, shuttle_photo_path):
+    entries = []
+    parking = escape(invitation.parking.strip())
+    if parking:
+        entries.append(f'        <div><dt>주차</dt><dd class="transport-description">{parking}</dd></div>\n')
+
+    shuttle = escape(invitation.shuttle.strip())
+    if shuttle or shuttle_photo_path is not None:
+        entries.append('        <div><dt>셔틀</dt><dd>')
+        if shuttle:
+            entries.append(f'<span class="transport-description">{shuttle}</span>')
+        if shuttle_photo_path is not None:
+            photo_url = escape("./" + quote(shuttle_photo_path.as_posix()))
+            entries.append(
+                '\n          <details class="shuttle-photo">\n'
+                '            <summary>탑승지 사진 보기</summary>\n'
+                f'            <img src="{photo_url}" alt="셔틀 탑승 장소" loading="lazy" decoding="async">\n'
+                '          </details>\n        '
+            )
+        entries.append('</dd></div>\n')
     if not entries:
         return ""
     return '      <dl class="transport">\n' + "".join(entries) + '      </dl>\n'
@@ -682,7 +703,7 @@ def render_contacts(invitation):
     )
 
 
-def render(invitation, photo_path, gallery, map_path=None):
+def render(invitation, photo_path, gallery, map_path=None, shuttle_photo_path=None):
     event_date, event_time = invitation.date, invitation.time
     weekday = "월화수목금토일"[event_date.weekday()]
     period = "오전" if event_time.hour < 12 else "오후"
@@ -737,7 +758,7 @@ def render(invitation, photo_path, gallery, map_path=None):
         venue_name=escape(invitation.venue_name),
         venue_summary=escape(venue_summary),
         directions_section=render_directions(invitation, map_path),
-        transport=render_transport(invitation),
+        transport=render_transport(invitation, shuttle_photo_path),
         contacts=render_contacts(invitation),
     )
     try:
@@ -777,7 +798,11 @@ def write_publish_bundle(invitation, output):
         for number, photo in enumerate(invitation.gallery_photos, start=1)
     ]
     map_path = Path("assets") / f"venue-map{directions.map_image.suffix.lower()}"
-    page = render(invitation, photo_path, gallery, map_path)
+    shuttle_photo = invitation.shuttle_photo
+    shuttle_photo_path = None
+    if shuttle_photo is not None:
+        shuttle_photo_path = Path("assets") / f"shuttle-stop{shuttle_photo.suffix.lower()}"
+    page = render(invitation, photo_path, gallery, map_path, shuttle_photo_path)
     with TemporaryDirectory(prefix=".wedding-", dir=output.parent) as temporary:
         bundle = Path(temporary) / "site"
         (bundle / "assets").mkdir(parents=True)
@@ -787,6 +812,8 @@ def write_publish_bundle(invitation, output):
         shutil.copytree(ROOT / LEAFLET_ASSETS, bundle / LEAFLET_ASSETS)
         shutil.copyfile(invitation.cover_photo, bundle / photo_path)
         shutil.copyfile(directions.map_image, bundle / map_path)
+        if shuttle_photo_path is not None:
+            shutil.copyfile(shuttle_photo, bundle / shuttle_photo_path)
         if gallery:
             (bundle / "assets/gallery").mkdir()
         for photo, output_path in gallery:
@@ -805,7 +832,8 @@ def main():
             photo_path = invitation.cover_photo.relative_to(ROOT)
             gallery = [(photo, photo.path.relative_to(ROOT)) for photo in invitation.gallery_photos]
             map_path = invitation.directions.map_image.relative_to(ROOT) if invitation.directions else None
-            write_preview(output, render(invitation, photo_path, gallery, map_path))
+            shuttle_photo_path = invitation.shuttle_photo.relative_to(ROOT) if invitation.shuttle_photo else None
+            write_preview(output, render(invitation, photo_path, gallery, map_path, shuttle_photo_path))
         else:
             output = args.publish_dir.absolute()
             write_publish_bundle(invitation, output)

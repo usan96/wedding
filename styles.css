@@ -461,7 +461,34 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 .transport dd {
   margin-top: .25rem;
   color: var(--muted);
-  white-space: pre-line;
+}
+
+.transport-description { white-space: pre-line; }
+
+.shuttle-photo { margin-top: .5rem; }
+
+.shuttle-photo summary {
+  width: fit-content;
+  max-width: 100%;
+  min-height: max(44px, 2.75rem);
+  padding: .5rem .75rem;
+  border: 1px solid var(--line);
+  border-radius: .375rem;
+  color: var(--olive);
+  cursor: pointer;
+}
+
+.shuttle-photo summary:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 2px;
+}
+
+.shuttle-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: .5rem;
+  border-radius: .375rem;
 }
 
 .thanks {
