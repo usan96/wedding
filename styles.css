@@ -424,6 +424,45 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 
 .thanks p { margin-top: 2rem; }
 
+.thanks:has(+ .contacts) { padding-bottom: 2.5rem; }
+
+.contacts { padding-bottom: 2.5rem; }
+
+.contact-cards {
+  display: grid;
+  max-width: 22rem;
+  gap: .5rem;
+  margin: 1rem auto 0;
+}
+
+.contact-card {
+  padding: .75rem .875rem;
+  border: 1px solid var(--line);
+  border-radius: .375rem;
+  text-align: left;
+}
+
+.contact-card h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.contact-link {
+  display: flex;
+  align-items: center;
+  min-height: max(44px, 2.75rem);
+  color: var(--olive);
+  text-underline-offset: .2em;
+}
+
+.contact-link:focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 2px;
+}
+
+.contact-account { margin-top: .375rem; }
+.contact-account span { color: var(--muted); }
+
 .share {
   padding: 1.75rem 6.5% 4.5rem;
 }

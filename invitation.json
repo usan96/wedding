@@ -2,9 +2,21 @@
   "status": "draft",
   "background_color": "#f8f6f0",
   "groom_name": "김병남",
+  "groom_phone": "",
+  "groom_account": {
+    "bank": "",
+    "number": "",
+    "holder": ""
+  },
   "groom_father_name": "",
   "groom_mother_name": "",
   "bride_name": "김민아",
+  "bride_phone": "",
+  "bride_account": {
+    "bank": "",
+    "number": "",
+    "holder": ""
+  },
   "bride_father_name": "",
   "bride_mother_name": "",
   "date": "2027-03-27",

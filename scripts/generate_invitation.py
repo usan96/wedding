@@ -33,7 +33,7 @@ REQUIRED_TEXT_FIELDS = ("groom_name", "bride_name", "venue_name", "venue_address
 OPTIONAL_TEXT_FIELDS = (
     "venue_hall", "venue_floor", "cover_photo_alt",
     "groom_father_name", "groom_mother_name", "bride_father_name", "bride_mother_name",
-    "parking", "shuttle",
+    "parking", "shuttle", "groom_phone", "bride_phone",
 )
 EXAMPLE_TEXT = {
     "groom_name": "예시 신랑",
@@ -46,8 +46,9 @@ EXAMPLE_TEXT = {
 INPUT_FIELDS = {
     *REQUIRED_TEXT_FIELDS, *OPTIONAL_TEXT_FIELDS,
     "status", "date", "time", "directions", "directions_url", "cover_photo", "gallery_photos",
-    "background_color",
+    "background_color", "groom_account", "bride_account",
 }
+ACCOUNT_FIELDS = ("bank", "number", "holder")
 DIRECTIONS_FIELDS = {"latitude", "longitude", "map_image", "naver_place_url", "tmap_place_url"}
 NAVER_PLACE_HOSTS = {"map.naver.com", "m.map.naver.com", "m.place.naver.com", "naver.me"}
 TMAP_PLACE_HOSTS = {"tmap.life", "poi.tmobiweb.com"}
@@ -74,6 +75,13 @@ class Directions:
 
 
 @dataclass(frozen=True)
+class Account:
+    bank: str
+    number: str
+    holder: str
+
+
+@dataclass(frozen=True)
 class Invitation:
     status: str
     groom_name: str
@@ -96,6 +104,10 @@ class Invitation:
     bride_mother_name: str = ""
     parking: str = ""
     shuttle: str = ""
+    groom_phone: str = ""
+    bride_phone: str = ""
+    groom_account: Account | None = None
+    bride_account: Account | None = None
 
 
 class JsonObject(dict):
@@ -437,6 +449,29 @@ def load_gallery_photos(values, status, map_image=None):
     return tuple(photos)
 
 
+def load_account(values, field):
+    account = values.get(field, {})
+    if not isinstance(account, dict):
+        raise InputError(f"{field} — 계좌 정보를 JSON 객체로 입력해 주세요.")
+    check_unique_fields(account, prefix=f"{field}.")
+    unknown = sorted(account.keys() - set(ACCOUNT_FIELDS))
+    if unknown:
+        fields = ", ".join(f"{field}.{name}" for name in unknown)
+        raise InputError(f"{fields} — 사용할 수 없는 항목입니다.")
+    details = {
+        name: text_field(account, name, optional=True, location=f"{field}.{name}").strip()
+        for name in ACCOUNT_FIELDS
+    }
+    if not any(details.values()):
+        return None
+    for name, value in details.items():
+        if not value:
+            raise InputError(f"{field}.{name} — 은행명, 계좌번호, 예금주를 모두 입력해 주세요.")
+    if not re.fullmatch(r"[0-9]+(?:[ -][0-9]+)*", details["number"]):
+        raise InputError(f"{field}.number — 숫자와 구분용 공백 또는 하이픈을 사용해 주세요.")
+    return Account(**details)
+
+
 def load_invitation():
     values = read_fields()
     status = text_field(values, "status")
@@ -460,6 +495,8 @@ def load_invitation():
         **required,
         **optional,
         background_color=background_color,
+        groom_account=load_account(values, "groom_account"),
+        bride_account=load_account(values, "bride_account"),
         date=parse_date(text_field(values, "date")),
         time=parse_time(text_field(values, "time")),
         directions_url=directions_url,
@@ -590,6 +627,48 @@ def render_transport(invitation):
     return '      <dl class="transport">\n' + "".join(entries) + '      </dl>\n'
 
 
+def render_contacts(invitation):
+    cards = []
+    for field, account, label in (
+        ("groom_phone", invitation.groom_account, "신랑 측"),
+        ("bride_phone", invitation.bride_account, "신부 측"),
+    ):
+        display_number = getattr(invitation, field).strip()
+        if not display_number and account is None:
+            continue
+        cards.append(f'        <div class="contact-card">\n          <h3>{label}</h3>\n')
+        if display_number:
+            dial_number = re.sub(r"[ ().-]", "", display_number)
+            if not re.fullmatch(r"\+?[0-9]{7,15}", dial_number):
+                raise InputError(f"{field} — 010-0000-0000과 같은 형식으로 전화번호를 입력해 주세요.")
+            cards.append(
+                f'          <a class="contact-link" href="tel:{dial_number}">'
+                f'{escape(display_number)}</a>\n'
+            )
+        if account is not None:
+            cards.append(
+                f'          <p class="contact-account">{escape(account.bank)} {escape(account.number)}'
+                f'<br><span>예금주 {escape(account.holder)}</span></p>\n'
+            )
+        cards.append('        </div>\n')
+    if not cards:
+        return ""
+    title_parts = []
+    if invitation.groom_phone.strip() or invitation.bride_phone.strip():
+        title_parts.append("연락처")
+    if invitation.groom_account is not None or invitation.bride_account is not None:
+        title_parts.append("계좌 안내")
+    title = " · ".join(title_parts)
+    return (
+        '    <section class="section contacts" aria-labelledby="contacts-title">\n'
+        f'      <h2 id="contacts-title">{title}</h2>\n'
+        '      <div class="contact-cards">\n'
+        + "".join(cards)
+        + '      </div>\n'
+        '    </section>\n\n'
+    )
+
+
 def render(invitation, photo_path, gallery, map_path=None):
     event_date, event_time = invitation.date, invitation.time
     weekday = "월화수목금토일"[event_date.weekday()]
@@ -645,6 +724,7 @@ def render(invitation, photo_path, gallery, map_path=None):
         venue_summary=escape(venue_summary),
         directions_section=render_directions(invitation, map_path),
         transport=render_transport(invitation),
+        contacts=render_contacts(invitation),
     )
     try:
         template = Template(TEMPLATE_FILE.read_text(encoding="utf-8"))
