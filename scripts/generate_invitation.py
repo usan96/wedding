@@ -52,6 +52,11 @@ ACCOUNT_FIELDS = ("bank", "number", "holder")
 DIRECTIONS_FIELDS = {"latitude", "longitude", "map_image", "naver_place_url", "tmap_place_url"}
 NAVER_PLACE_HOSTS = {"map.naver.com", "m.map.naver.com", "m.place.naver.com", "naver.me"}
 TMAP_PLACE_HOSTS = {"tmap.life", "poi.tmobiweb.com"}
+LEAFLET_ASSETS = Path("vendor/leaflet")
+LEAFLET_TAGS = (
+    '  <link rel="stylesheet" href="./vendor/leaflet/leaflet.css">\n'
+    '  <script src="./vendor/leaflet/leaflet.js" defer></script>\n'
+)
 
 
 class InputError(ValueError):
@@ -568,6 +573,8 @@ def render_directions(invitation, map_path):
 
     map_url = escape("./" + quote(map_path.as_posix()))
     venue = escape(invitation.venue_name)
+    naver_client_id = os.environ.get("NAVER_MAP_CLIENT_ID", "").strip()
+    naver_map_attribute = f' data-naver-client-id="{escape(naver_client_id)}"' if naver_client_id else ""
     naver_query = escape(urlencode(dict(
         dlat=directions.latitude, dlng=directions.longitude, dname=invitation.venue_name
     )))
@@ -588,7 +595,14 @@ def render_directions(invitation, map_path):
         '        <h2 id="directions-title">오시는 길</h2>\n'
         f'        {address}'
         '        <figure class="venue-map">\n'
-        f'          <img src="{map_url}" alt="{venue} 위치와 주변 도로" decoding="async">\n'
+        '          <div class="venue-map-frame">\n'
+        f'            <img class="venue-map-image" src="{map_url}" alt="{venue} 위치와 주변 도로" decoding="async">\n'
+        '            <div class="venue-map-interactive" inert role="region"\n'
+        f'              aria-label="{venue} 지도" data-venue="{venue}"\n'
+        f'              data-latitude="{directions.latitude}" data-longitude="{directions.longitude}"'
+        f'{naver_map_attribute}></div>\n'
+        '          </div>\n'
+        '          <p class="venue-map-hint">두 손가락으로 지도를 움직이거나 확대·축소할 수 있어요.</p>\n'
         '          <figcaption><a href="https://www.openstreetmap.org/copyright">'
         '© OpenStreetMap contributors</a></figcaption>\n'
         '        </figure>\n'
@@ -703,6 +717,7 @@ def render(invitation, photo_path, gallery, map_path=None):
         page_title=title,
         background_color=escape(invitation.background_color),
         robots='  <meta name="robots" content="noindex">\n' if draft else "",
+        leaflet_tags=LEAFLET_TAGS if invitation.directions else "",
         draft_attribute=" data-draft" if draft else "",
         draft_note=draft_note,
         sample_class=" portrait--sample" if sample else "",
@@ -769,6 +784,7 @@ def write_publish_bundle(invitation, output):
         (bundle / "index.html").write_text(page, encoding="utf-8")
         for asset in ("styles.css", "invitation.js"):
             shutil.copyfile(ROOT / asset, bundle / asset)
+        shutil.copytree(ROOT / LEAFLET_ASSETS, bundle / LEAFLET_ASSETS)
         shutil.copyfile(invitation.cover_photo, bundle / photo_path)
         shutil.copyfile(directions.map_image, bundle / map_path)
         if gallery:

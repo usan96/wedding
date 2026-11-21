@@ -26,6 +26,7 @@ jobs:
       - name: Prepare invitation files
         env:
           TMAP_PUBLIC_APP_KEY: ${{ vars.TMAP_PUBLIC_APP_KEY }}
+          NAVER_MAP_CLIENT_ID: ${{ vars.NAVER_MAP_CLIENT_ID }}
         run: python scripts/generate_invitation.py --publish-dir _site
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4

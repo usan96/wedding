@@ -35,6 +35,10 @@
 
 `directions`에 도로명 주소와 대조한 위도 `latitude`와 경도 `longitude`, `assets/` 아래의 대표 지도 `map_image`, 네이버 지도 장소 상세 링크 `naver_place_url`을 입력합니다. 대표 지도는 PNG 또는 WebP를 사용합니다. 카카오맵 길찾기 링크는 예식장 이름과 좌표에서 생성합니다.
 
+오시는 길 영역이 보이면 예식장 핀이 있는 지도를 불러옵니다. `NAVER_MAP_CLIENT_ID`가 설정되어 있으면 네이버 지도를 먼저 불러옵니다. 설정이 없거나 네이버 지도를 불러오지 못하면 Leaflet과 OpenStreetMap을 사용합니다. 지도를 불러오는 중이거나 두 지도를 불러올 수 없는 경우에는 대표 지도를 표시합니다.
+
+네이버 클라우드 [Maps Application](https://guide.ncloud-docs.com/docs/application-maps-app-vpc)에서 Dynamic Map을 선택하고 Web 서비스 URL에 `https://usan96.github.io`를 등록합니다. 로컬 미리보기에 사용할 주소도 포트 없이 등록합니다. 인증 정보의 **Client ID**를 GitHub 저장소의 Actions 변수 `NAVER_MAP_CLIENT_ID`에 설정합니다. 로컬 미리보기에서는 같은 이름의 환경 변수를 생성 명령에 전달합니다. Client ID는 브라우저에 전달되며 Client Secret은 사용하지 않습니다. 대표 계정의 무료 범위로 제한하려면 Maps의 한도 설정에서 일별·월별 한도와 초과 사용 비허용을 확인합니다.
+
 T맵 앱의 예식장 장소 상세에서 복사한 공유 링크는 `tmap_place_url`에 입력합니다. 공유 링크로 앱에 목적지를 넘길 수 없다면 T맵의 공식 경로 호출에 사용할 수 있는 공개 웹용 프로젝트 키를 `TMAP_PUBLIC_APP_KEY`로 설정합니다. 로컬에서는 생성 명령의 환경 변수로, GitHub Pages에서는 Actions 변수로 전달합니다. 이 키는 생성된 HTML에 보이므로 공개 웹 사용과 범위 제한이 확인된 키만 사용합니다.
 
 T맵 연결값이 없는 초안은 T맵 버튼을 눌렀을 때 주소와 다른 지도 서비스를 안내합니다. 게시용 생성에는 T맵 장소 링크 또는 공식 경로 호출 설정이 필요합니다. 기존 `directions_url`만 가진 파일은 기존 링크로 미리 볼 수 있으며, 게시하려면 새 지도 설정을 입력하고 예시 링크를 삭제합니다.

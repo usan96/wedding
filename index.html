@@ -6,6 +6,8 @@
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#f8f6f0">
   <title>김병남 · 김민아 | 모바일 청첩장 초안</title>
+  <link rel="stylesheet" href="./vendor/leaflet/leaflet.css">
+  <script src="./vendor/leaflet/leaflet.js" defer></script>
   <link rel="stylesheet" href="./styles.css">
   <script src="./invitation.js" defer></script>
 </head>
@@ -127,7 +129,13 @@
         <h2 id="directions-title">오시는 길</h2>
         <p class="venue-address">경기도 성남시 분당구 판교역로226번길 16</p>
         <figure class="venue-map">
-          <img src="./assets/venue-map.png" alt="더블유스퀘어컨벤션 위치와 주변 도로" decoding="async">
+          <div class="venue-map-frame">
+            <img class="venue-map-image" src="./assets/venue-map.png" alt="더블유스퀘어컨벤션 위치와 주변 도로" decoding="async">
+            <div class="venue-map-interactive" inert role="region"
+              aria-label="더블유스퀘어컨벤션 지도" data-venue="더블유스퀘어컨벤션"
+              data-latitude="37.4006298" data-longitude="127.1114621"></div>
+          </div>
+          <p class="venue-map-hint">두 손가락으로 지도를 움직이거나 확대·축소할 수 있어요.</p>
           <figcaption><a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a></figcaption>
         </figure>
         <div class="directions-actions">

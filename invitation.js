@@ -62,6 +62,122 @@ if (typeof galleryDialog?.showModal === "function") {
   });
 }
 
+const venueMap = document.querySelector(".venue-map-interactive");
+
+if (venueMap && /^https?:$/.test(location.protocol)) {
+  const { latitude, longitude, venue, naverClientId } = venueMap.dataset;
+  const center = [Number(latitude), Number(longitude)];
+  const touchScreen = matchMedia("(pointer: coarse)").matches;
+  const figure = venueMap.closest(".venue-map");
+
+  function showVenueMap(provider) {
+    figure.classList.add("is-interactive");
+    figure.dataset.mapProvider = provider;
+    venueMap.removeAttribute("inert");
+  }
+
+  function loadOpenStreetMap() {
+    const leaflet = window.L;
+    if (!leaflet) return;
+    const map = leaflet.map(venueMap, {
+      attributionControl: false,
+      zoomControl: false,
+      scrollWheelZoom: false,
+      dragging: !touchScreen,
+    }).setView(center, 16);
+
+    leaflet.control.zoom({ zoomInTitle: "확대", zoomOutTitle: "축소" }).addTo(map);
+    const pinLabel = document.createElement("span");
+    pinLabel.textContent = venue;
+    leaflet.marker(center, { alt: venue, title: venue }).addTo(map).bindPopup(pinLabel);
+
+    const tiles = leaflet.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 });
+    const fallback = window.setTimeout(() => map.remove(), 8000);
+    let tileFailed = false;
+    tiles.on("tileerror", () => { tileFailed = true; });
+    tiles.once("load", () => {
+      window.clearTimeout(fallback);
+      if (tileFailed) {
+        // Let Leaflet finish dispatching the tile load event before removing the layer.
+        queueMicrotask(() => map.remove());
+        return;
+      }
+      showVenueMap("openstreetmap");
+    });
+    tiles.addTo(map);
+  }
+
+  function loadNaverMap() {
+    const container = document.createElement("div");
+    container.className = "venue-map-naver";
+    const script = document.createElement("script");
+    const params = new URLSearchParams({ ncpKeyId: naverClientId });
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?${params}`;
+    let map;
+    let failed = false;
+    const resizeMap = () => map.autoResize();
+    const timeout = window.setTimeout(useOpenStreetMap, 5000);
+
+    function useOpenStreetMap() {
+      if (failed) return;
+      failed = true;
+      window.clearTimeout(timeout);
+      queueMicrotask(() => {
+        window.removeEventListener("resize", resizeMap);
+        figure.classList.remove("is-interactive");
+        delete figure.dataset.mapProvider;
+        venueMap.setAttribute("inert", "");
+        map?.destroy();
+        container.remove();
+        script.remove();
+        loadOpenStreetMap();
+      });
+    }
+
+    window.navermap_authFailure = useOpenStreetMap;
+    script.addEventListener("load", () => {
+      if (failed) return;
+      try {
+        const maps = window.naver.maps;
+        const position = new maps.LatLng(...center);
+        map = new maps.Map(container, {
+          center: position,
+          zoom: 16,
+          zoomControl: true,
+          scrollWheel: false,
+          draggable: !touchScreen,
+        });
+        new maps.Marker({ map, position, title: venue });
+        maps.Event.once(map, "tilesloaded", () => {
+          if (failed) return;
+          window.clearTimeout(timeout);
+          showVenueMap("naver");
+        });
+        window.addEventListener("resize", resizeMap);
+      } catch {
+        useOpenStreetMap();
+      }
+    }, { once: true });
+
+    script.addEventListener("error", useOpenStreetMap);
+    container.addEventListener("error", useOpenStreetMap, true);
+    venueMap.append(container);
+    document.head.append(script);
+  }
+
+  const loadVenueMap = naverClientId ? loadNaverMap : loadOpenStreetMap;
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      observer.disconnect();
+      loadVenueMap();
+    });
+    observer.observe(venueMap);
+  } else {
+    loadVenueMap();
+  }
+}
+
 const directions = document.querySelector(".directions-actions");
 
 if (directions) {
