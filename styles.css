@@ -1,8 +1,5 @@
 :root {
   color-scheme: light;
-  --paper: #f8f6f0;
-  --cover: #f3f1e8;
-  --backdrop: #e9ebe5;
   --ink: #252920;
   --olive: #4b583f;
   --muted: #555b4e;
@@ -10,7 +7,7 @@
   --serif: "Noto Serif KR", "Songti SC", "AppleMyungjo", Batang, Georgia, serif;
   font-family: system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   color: var(--ink);
-  background: var(--backdrop);
+  background: var(--paper);
 }
 
 * { box-sizing: border-box; }
@@ -33,7 +30,6 @@ h1, h2, p, figure, dl, dd { margin: 0; }
 .cover {
   padding: 1rem 8.5% 3.5rem;
   border-top: .25rem solid var(--olive);
-  background: var(--cover);
   text-align: left;
 }
 
@@ -132,23 +128,14 @@ h1, h2, p, figure, dl, dd { margin: 0; }
 .section p { line-height: 1.9; }
 
 .greeting {
-  padding-top: 4.25rem;
-  padding-bottom: 4.5rem;
+  padding-top: 1rem;
+  padding-bottom: 2.5rem;
 }
 
-.greeting-names {
-  margin-top: 2.625rem;
-  font-size: 1.0625rem;
-}
-
-.greeting-names span {
-  margin-inline: .45rem;
-  color: var(--olive);
-  font-size: .85em;
-}
-
-.greeting-message { margin-top: 2.875rem; }
 .greeting-message p + p { margin-top: .75rem; }
+
+.family { margin-top: 2rem; }
+.family p + p { margin-top: .375rem; }
 
 .gallery {
   padding-bottom: 1.5rem;
@@ -159,7 +146,6 @@ h1, h2, p, figure, dl, dd { margin: 0; }
   grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-auto-rows: clamp(3.75rem, 21vw, 5.75rem);
   gap: .375rem;
-  margin-top: 1.5rem;
 }
 
 .gallery-photo {
@@ -167,7 +153,7 @@ h1, h2, p, figure, dl, dd { margin: 0; }
   display: block;
   overflow: hidden;
   border-radius: .5rem;
-  background: var(--cover);
+  background: var(--paper);
 }
 
 .gallery-photo[hidden] { display: none; }
@@ -257,7 +243,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   height: min(65vh, 42rem);
   height: min(65dvh, 42rem);
   border-radius: .5rem;
-  background: var(--cover);
+  background: var(--paper);
   object-fit: contain;
 }
 
@@ -273,7 +259,8 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 
 .schedule { padding-top: 2.5rem; }
 
-.event-date { margin-top: 1rem; }
+.event-date { font-weight: 600; }
+.event-venue { color: var(--muted); }
 
 .calendar-card {
   max-width: 22rem;
@@ -331,23 +318,13 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   white-space: nowrap;
 }
 
-.venue {
-  max-width: 22rem;
-  margin: 1.75rem auto 0;
-  text-align: left;
-  border-top: 1px solid var(--line);
+.venue-address {
+  margin: 1.75rem 0 0;
+  color: var(--muted);
+  font-size: .875rem;
 }
 
-.venue div {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-  gap: .5rem;
-  padding: .875rem .25rem;
-  border-bottom: 1px solid var(--line);
-}
-
-.venue dt { font-weight: 600; }
-.venue dd { color: var(--muted); }
+.directions .venue-address { margin: .5rem 0 1rem; }
 
 .directions-link {
   display: inline-flex;
@@ -375,9 +352,8 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   margin: 2.5rem auto 0;
 }
 
-.directions h3 {
-  margin: 0 0 1rem;
-  font-family: var(--serif);
+.directions h2 {
+  color: var(--ink);
   font-size: 1.25rem;
   font-weight: 600;
 }
@@ -396,8 +372,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   line-height: 1.5;
 }
 
-.venue-map a,
-.directions-help a {
+.venue-map a {
   color: var(--olive);
   text-underline-offset: .2em;
 }
@@ -418,8 +393,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   font-size: .875rem;
 }
 
-.directions-notice,
-.directions-help {
+.directions-notice {
   margin-top: .75rem;
   font-size: .8125rem;
   line-height: 1.5;
@@ -427,8 +401,21 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 }
 
 .directions-notice:not(:target) { display: none; }
-.directions-help summary { cursor: pointer; }
-.directions-help p { margin-top: .375rem; }
+
+.transport {
+  max-width: 22rem;
+  margin: 1.5rem auto 0;
+  text-align: left;
+  line-height: 1.6;
+}
+
+.transport div + div { margin-top: 1rem; }
+.transport dt { font-weight: 600; }
+.transport dd {
+  margin-top: .25rem;
+  color: var(--muted);
+  white-space: pre-line;
+}
 
 .thanks {
   padding-top: 5.5rem;

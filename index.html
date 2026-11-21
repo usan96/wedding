@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" style="--paper: #f8f6f0">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -30,9 +30,7 @@
       </div>
     </header>
 
-    <section class="section greeting" aria-labelledby="greeting-title">
-      <h2 id="greeting-title">초대합니다</h2>
-      <p class="greeting-names">김병남 <span aria-hidden="true">♥</span> 김민아</p>
+    <section class="section greeting" aria-label="초대 인사">
       <div class="greeting-message">
         <p>서로의 일상에 가장 다정한 사람이 되어<br>
           이제 같은 길을 걸으려 합니다.</p>
@@ -41,8 +39,7 @@
       </div>
     </section>
 
-    <section class="section gallery" aria-labelledby="gallery-title">
-      <h2 id="gallery-title">사진</h2>
+    <section class="section gallery" aria-label="웨딩 사진">
       <div class="gallery-photos">
         <a class="gallery-photo" href="./assets/HE_00283-1.jpg">
           <img src="./assets/HE_00283-1.jpg" alt="웨딩 사진 1" loading="lazy">
@@ -100,9 +97,9 @@
       </dialog>
     </section>
 
-    <section class="section schedule" aria-labelledby="schedule-title">
-      <h2 id="schedule-title">예식 일정</h2>
-      <p class="event-date"><time datetime="2027-03-27T14:30">2027년 3월 27일 토요일</time></p>
+    <section class="section schedule" aria-label="예식 일정">
+      <p class="event-date"><time datetime="2027-03-27T14:30">2027. 3. 27. (토) 오후 2시 30분</time></p>
+      <p class="event-venue">더블유스퀘어컨벤션 L층 그레이스 홀</p>
       <div class="calendar-card">
         <table class="calendar">
           <caption>2027년 3월</caption>
@@ -122,15 +119,9 @@
         </table>
       </div>
 
-      <dl class="venue">
-        <div><dt>예식 시각</dt><dd>오후 2시 30분</dd></div>
-        <div><dt>예식 장소</dt><dd>더블유스퀘어컨벤션</dd></div>
-        <div><dt>주소</dt><dd>경기도 성남시 분당구 판교역로226번길 16</dd></div>
-        <div><dt>홀</dt><dd>그레이스 홀</dd></div>
-        <div><dt>층</dt><dd>L층</dd></div>
-      </dl>
       <section class="directions" aria-labelledby="directions-title">
-        <h3 id="directions-title">오시는 길</h3>
+        <h2 id="directions-title">오시는 길</h2>
+        <p class="venue-address">경기도 성남시 분당구 판교역로226번길 16</p>
         <figure class="venue-map">
           <img src="./assets/venue-map.png" alt="더블유스퀘어컨벤션 위치와 주변 도로" decoding="async">
           <figcaption><a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a></figcaption>
@@ -140,11 +131,6 @@
           <a class="directions-link" href="https://map.kakao.com/link/to/%EB%8D%94%EB%B8%94%EC%9C%A0%EC%8A%A4%ED%80%98%EC%96%B4%EC%BB%A8%EB%B2%A4%EC%85%98,37.4006298,127.1114621">카카오맵</a>
           <a class="directions-link" href="https://tmap.life/0ffb7f67">T맵</a>
         </div>
-        <details class="directions-help">
-          <summary>길찾기가 안 되나요?</summary>
-          <p>지도 앱과 웹 화면이 모두 열리지 않으면 위 예식장 주소를 복사하거나 다른 지도 버튼을 선택해 주세요.</p>
-          <p><a href="https://map.naver.com/p/entry/place/36301790">네이버 지도 웹에서 보기</a> · <a href="https://map.kakao.com/link/to/%EB%8D%94%EB%B8%94%EC%9C%A0%EC%8A%A4%ED%80%98%EC%96%B4%EC%BB%A8%EB%B2%A4%EC%85%98,37.4006298,127.1114621">카카오맵 웹에서 보기</a> · <a href="https://tmap.life/0ffb7f67">T맵 웹에서 보기</a></p>
-        </details>
       </section>
     </section>
 

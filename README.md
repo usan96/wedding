@@ -1,17 +1,23 @@
 # 모바일 청첩장
 
-저장소 루트의 [invitation.json](invitation.json)을 수정한 뒤 생성 명령을 실행합니다. 이름, 예식 일시, 장소, 길찾기 링크와 표지 사진이 `index.html`에 반영됩니다.
+저장소 루트의 [invitation.json](invitation.json)을 수정한 뒤 생성 명령을 실행합니다. 이름, 예식 일시, 장소, 길찾기 링크, 표지 사진과 배경색이 `index.html`에 반영됩니다.
 
 | 입력 항목 | 입력 예시 |
 | --- | --- |
 | `status` | 초안 검토 중에는 `"draft"` |
+| `background_color` | 표지와 본문의 배경색. `"#f8f6f0"`처럼 6자리 색상 코드를 입력합니다. |
 | `groom_name`, `bride_name` | `"예시 신랑"`, `"예시 신부"` |
+| `groom_father_name`, `groom_mother_name` | 신랑 아버지와 어머니 성함 |
+| `bride_father_name`, `bride_mother_name` | 신부 아버지와 어머니 성함 |
 | `date`, `time` | 예식장 현지 날짜와 24시간제 시작 시각 `"2027-03-13"`, `"14:30"` |
 | `venue_name`, `venue_address` | `"예시 웨딩홀"`, `"예시 주소"` |
 | `directions` | 예식장 좌표, 대표 지도 이미지와 서비스별 장소 링크 |
 | `cover_photo` | 확정 사진의 상대 경로 `"assets/우리 사진.jpg"`. JPG, PNG, WebP 사용 가능 |
 | `venue_hall`, `venue_floor` | 선택 항목 `"예시 홀"`, `"2층"` |
+| `parking`, `shuttle` | 지도 버튼 아래에 표시할 주차와 셔틀 안내. 여러 줄은 문자열 안에 `\n`을 넣어 구분합니다. |
 | `cover_photo_alt` | 선택 항목 `"예식장 정원에서 촬영한 웨딩 사진"` |
+
+부모님 성함과 주차·셔틀 안내는 공개할 내용만 입력하세요. 빈 항목은 화면에 표시되지 않습니다.
 
 ## 예식 일정 위에 사진 추가
 

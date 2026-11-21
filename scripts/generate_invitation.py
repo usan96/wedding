@@ -28,8 +28,13 @@ TEMPLATE_FILE = ROOT / "templates" / "invitation.html"
 SAMPLE_PHOTO = ROOT / "sample.png"
 ASSETS_DIR = ROOT / "assets"
 PHOTO_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+DEFAULT_BACKGROUND_COLOR = "#f8f6f0"
 REQUIRED_TEXT_FIELDS = ("groom_name", "bride_name", "venue_name", "venue_address")
-OPTIONAL_TEXT_FIELDS = ("venue_hall", "venue_floor", "cover_photo_alt")
+OPTIONAL_TEXT_FIELDS = (
+    "venue_hall", "venue_floor", "cover_photo_alt",
+    "groom_father_name", "groom_mother_name", "bride_father_name", "bride_mother_name",
+    "parking", "shuttle",
+)
 EXAMPLE_TEXT = {
     "groom_name": "예시 신랑",
     "bride_name": "예시 신부",
@@ -41,6 +46,7 @@ EXAMPLE_TEXT = {
 INPUT_FIELDS = {
     *REQUIRED_TEXT_FIELDS, *OPTIONAL_TEXT_FIELDS,
     "status", "date", "time", "directions", "directions_url", "cover_photo", "gallery_photos",
+    "background_color",
 }
 DIRECTIONS_FIELDS = {"latitude", "longitude", "map_image", "naver_place_url", "tmap_place_url"}
 NAVER_PLACE_HOSTS = {"map.naver.com", "m.map.naver.com", "m.place.naver.com", "naver.me"}
@@ -83,6 +89,13 @@ class Invitation:
     cover_photo: Path
     gallery_photos: tuple[GalleryPhoto, ...] = ()
     directions: Directions | None = None
+    background_color: str = DEFAULT_BACKGROUND_COLOR
+    groom_father_name: str = ""
+    groom_mother_name: str = ""
+    bride_father_name: str = ""
+    bride_mother_name: str = ""
+    parking: str = ""
+    shuttle: str = ""
 
 
 class JsonObject(dict):
@@ -431,6 +444,9 @@ def load_invitation():
         raise InputError("status — draft 또는 confirmed를 입력해 주세요.")
     required = {field: text_field(values, field) for field in REQUIRED_TEXT_FIELDS}
     optional = {field: text_field(values, field, optional=True) for field in OPTIONAL_TEXT_FIELDS}
+    background_color = text_field(values, "background_color", optional=True).strip() or DEFAULT_BACKGROUND_COLOR
+    if not re.fullmatch(r"#[0-9a-fA-F]{6}", background_color):
+        raise InputError("background_color — #f8f6f0처럼 # 뒤에 6자리 색상 코드를 입력해 주세요.")
     if status == "confirmed":
         for field, example in EXAMPLE_TEXT.items():
             if values.get(field, "").strip() == example:
@@ -443,6 +459,7 @@ def load_invitation():
         status=status,
         **required,
         **optional,
+        background_color=background_color,
         date=parse_date(text_field(values, "date")),
         time=parse_time(text_field(values, "time")),
         directions_url=directions_url,
@@ -484,8 +501,7 @@ def render_gallery(gallery):
             '        </a>\n'
         )
     return (
-        '    <section class="section gallery" aria-labelledby="gallery-title">\n'
-        '      <h2 id="gallery-title">사진</h2>\n'
+        '    <section class="section gallery" aria-label="웨딩 사진">\n'
         '      <div class="gallery-photos">\n'
         + "".join(images)
         + '      </div>\n'
@@ -506,8 +522,12 @@ def render_gallery(gallery):
 
 def render_directions(invitation, map_path):
     directions = invitation.directions
+    address = f'<p class="venue-address">{escape(invitation.venue_address)}</p>\n'
     if directions is None:
-        return f'      <a class="directions-link" href="{escape(invitation.directions_url)}">길찾기</a>\n'
+        return (
+            f'      {address}'
+            f'      <a class="directions-link" href="{escape(invitation.directions_url)}">길찾기</a>\n'
+        )
 
     map_url = escape("./" + quote(map_path.as_posix()))
     venue = escape(invitation.venue_name)
@@ -521,9 +541,6 @@ def render_directions(invitation, map_path):
     tmap_route = directions.tmap_route_url
     tmap_action = f' data-tmap-route="{escape(tmap_route)}"' if tmap_route else ""
     tmap_help = ""
-    tmap_web = ""
-    if directions.tmap_place_url:
-        tmap_web = f' · <a href="{tmap_url}">T맵 웹에서 보기</a>'
     if not directions.tmap_place_url:
         tmap_help = (
             '        <p id="tmap-help" class="directions-notice" tabindex="-1">'
@@ -531,7 +548,8 @@ def render_directions(invitation, map_path):
         )
     return (
         '      <section class="directions" aria-labelledby="directions-title">\n'
-        '        <h3 id="directions-title">오시는 길</h3>\n'
+        '        <h2 id="directions-title">오시는 길</h2>\n'
+        f'        {address}'
         '        <figure class="venue-map">\n'
         f'          <img src="{map_url}" alt="{venue} 위치와 주변 도로" decoding="async">\n'
         '          <figcaption><a href="https://www.openstreetmap.org/copyright">'
@@ -543,19 +561,38 @@ def render_directions(invitation, map_path):
         f'          <a class="directions-link" href="{tmap_url}"{tmap_action}>T맵</a>\n'
         '        </div>\n'
         f'{tmap_help}'
-        '        <details class="directions-help">\n'
-        '          <summary>길찾기가 안 되나요?</summary>\n'
-        '          <p>지도 앱과 웹 화면이 모두 열리지 않으면 위 예식장 주소를 복사하거나 다른 지도 버튼을 선택해 주세요.</p>\n'
-        f'          <p><a href="{naver_url}">네이버 지도 웹에서 보기</a> · '
-        f'<a href="{kakao_url}">카카오맵 웹에서 보기</a>{tmap_web}</p>\n'
-        '        </details>\n'
         '      </section>\n'
     )
 
 
+def render_parents(invitation):
+    lines = []
+    for father, mother, relationship, name in (
+        (invitation.groom_father_name, invitation.groom_mother_name, "아들", invitation.groom_name),
+        (invitation.bride_father_name, invitation.bride_mother_name, "딸", invitation.bride_name),
+    ):
+        parents = " · ".join(escape(parent.strip()) for parent in (father, mother) if parent.strip())
+        if parents:
+            lines.append(f"        <p>{parents}의 {relationship} <strong>{escape(name)}</strong></p>\n")
+    if not lines:
+        return ""
+    return '      <div class="family">\n' + "".join(lines) + '      </div>\n'
+
+
+def render_transport(invitation):
+    entries = [
+        f"        <div><dt>{label}</dt><dd>{escape(value.strip())}</dd></div>\n"
+        for label, value in (("주차", invitation.parking), ("셔틀", invitation.shuttle))
+        if value.strip()
+    ]
+    if not entries:
+        return ""
+    return '      <dl class="transport">\n' + "".join(entries) + '      </dl>\n'
+
+
 def render(invitation, photo_path, gallery, map_path=None):
     event_date, event_time = invitation.date, invitation.time
-    weekday = "월화수목금토일"[event_date.weekday()] + "요일"
+    weekday = "월화수목금토일"[event_date.weekday()]
     period = "오전" if event_time.hour < 12 else "오후"
     display_time = f"{period} {event_time.hour % 12 or 12}시"
     if event_time.minute:
@@ -577,15 +614,16 @@ def render(invitation, photo_path, gallery, map_path=None):
         if (sample and not example_info) or any(is_sample_photo(photo.path) for photo in invitation.gallery_photos):
             note += " · 예시 사진이 포함되어 있습니다."
         draft_note = f'      <p class="draft-note">{note}</p>\n\n'
-    venue_details = "".join(
-        f"        <div><dt>{label}</dt><dd>{escape(value)}</dd></div>\n"
-        for label, value in (("홀", invitation.venue_hall), ("층", invitation.venue_floor))
-        if value
+    venue_summary = " ".join(
+        value.strip()
+        for value in (invitation.venue_name, invitation.venue_floor, invitation.venue_hall)
+        if value.strip()
     )
     photo_alt = invitation.cover_photo_alt or ("예시 웨딩 사진" if sample else "웨딩 사진")
 
     values = dict(
         page_title=title,
+        background_color=escape(invitation.background_color),
         robots='  <meta name="robots" content="noindex">\n' if draft else "",
         draft_attribute=" data-draft" if draft else "",
         draft_note=draft_note,
@@ -595,17 +633,18 @@ def render(invitation, photo_path, gallery, map_path=None):
         photo_alt=escape(photo_alt),
         groom_name=groom,
         bride_name=bride,
-        cover_date=event_date.isoformat().replace("-", ".") + " " + weekday,
-        schedule_date=f"{event_date.year}년 {event_date.month}월 {event_date.day}일 {weekday}",
+        cover_date=f"{event_date.isoformat().replace('-', '.')} {weekday}요일",
+        schedule_date=f"{event_date.year}. {event_date.month}. {event_date.day}. ({weekday})",
         event_datetime=f"{event_date.isoformat()}T{event_time.isoformat(timespec='minutes')}",
         event_time=display_time,
         calendar_month=f"{event_date.year}년 {event_date.month}월",
         calendar_rows=calendar_rows(event_date),
         gallery=render_gallery(gallery),
+        parents=render_parents(invitation),
         venue_name=escape(invitation.venue_name),
-        venue_address=escape(invitation.venue_address),
-        venue_details=venue_details,
+        venue_summary=escape(venue_summary),
         directions_section=render_directions(invitation, map_path),
+        transport=render_transport(invitation),
     )
     try:
         template = Template(TEMPLATE_FILE.read_text(encoding="utf-8"))

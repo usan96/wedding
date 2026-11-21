@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ko">
+<html lang="ko" style="--paper: $background_color">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-$robots  <meta name="theme-color" content="#f8f6f0">
+$robots  <meta name="theme-color" content="$background_color">
   <title>$page_title</title>
   <link rel="stylesheet" href="./styles.css">
   <script src="./invitation.js" defer></script>
@@ -27,20 +27,18 @@ $draft_note      <figure class="portrait$sample_class">
       </div>
     </header>
 
-    <section class="section greeting" aria-labelledby="greeting-title">
-      <h2 id="greeting-title">초대합니다</h2>
-      <p class="greeting-names">$groom_name <span aria-hidden="true">♥</span> $bride_name</p>
+    <section class="section greeting" aria-label="초대 인사">
       <div class="greeting-message">
         <p>서로의 일상에 가장 다정한 사람이 되어<br>
           이제 같은 길을 걸으려 합니다.</p>
         <p>저희의 첫걸음을 함께 축복해 주시면<br>
           더없이 기쁘겠습니다.</p>
       </div>
-    </section>
+$parents    </section>
 
-$gallery    <section class="section schedule" aria-labelledby="schedule-title">
-      <h2 id="schedule-title">예식 일정</h2>
-      <p class="event-date"><time datetime="$event_datetime">$schedule_date</time></p>
+$gallery    <section class="section schedule" aria-label="예식 일정">
+      <p class="event-date"><time datetime="$event_datetime">$schedule_date $event_time</time></p>
+      <p class="event-venue">$venue_summary</p>
       <div class="calendar-card">
         <table class="calendar">
           <caption>$calendar_month</caption>
@@ -55,12 +53,7 @@ $calendar_rows          </tbody>
         </table>
       </div>
 
-      <dl class="venue">
-        <div><dt>예식 시각</dt><dd>$event_time</dd></div>
-        <div><dt>예식 장소</dt><dd>$venue_name</dd></div>
-        <div><dt>주소</dt><dd>$venue_address</dd></div>
-$venue_details      </dl>
-$directions_section    </section>
+$directions_section$transport    </section>
 
     <section class="section thanks" aria-labelledby="thanks-title">
       <h2 id="thanks-title">축하의 마음</h2>
