@@ -27,6 +27,7 @@ INPUT_FILE = ROOT / "invitation.json"
 TEMPLATE_FILE = ROOT / "templates" / "invitation.html"
 SAMPLE_PHOTO = ROOT / "sample.png"
 ASSETS_DIR = ROOT / "assets"
+GALLERY_DIR = ASSETS_DIR / "gallery"
 PHOTO_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 DEFAULT_BACKGROUND_COLOR = "#f8f6f0"
 REQUIRED_TEXT_FIELDS = ("groom_name", "bride_name", "venue_name", "venue_address")
@@ -436,23 +437,21 @@ def load_gallery_descriptions(values):
     return descriptions
 
 
-def load_gallery_photos(values, status, map_image=None, shuttle_photo=None):
+def load_gallery_photos(values, status):
     descriptions = load_gallery_descriptions(values)
     paths = sorted(
         (
-            path for path in ASSETS_DIR.rglob("*")
+            path for path in GALLERY_DIR.rglob("*")
             if path.suffix.lower() in PHOTO_EXTENSIONS and path.is_file()
         ),
-        key=lambda path: (path.name.casefold(), path.relative_to(ASSETS_DIR).as_posix()),
+        key=lambda path: (path.name.casefold(), path.relative_to(GALLERY_DIR).as_posix()),
     )
     photos = []
-    excluded = {map_image, shuttle_photo}
     for path in paths:
-        if path.resolve() in excluded:
-            continue
         relative = path.relative_to(ROOT).as_posix()
         photo = validate_photo(relative, status, location=relative)
-        photos.append(GalleryPhoto(photo, descriptions.get(relative, "")))
+        previous_path = (ASSETS_DIR.relative_to(ROOT) / path.relative_to(GALLERY_DIR)).as_posix()
+        photos.append(GalleryPhoto(photo, descriptions.get(relative, descriptions.get(previous_path, ""))))
     return tuple(photos)
 
 
@@ -512,7 +511,7 @@ def load_invitation():
         time=parse_time(text_field(values, "time")),
         directions_url=directions_url,
         cover_photo=validate_photo(text_field(values, "cover_photo"), status),
-        gallery_photos=load_gallery_photos(values, status, directions.map_image if directions else None, shuttle_photo),
+        gallery_photos=load_gallery_photos(values, status),
         directions=directions,
         shuttle_photo=shuttle_photo,
     )
