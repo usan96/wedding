@@ -4,11 +4,24 @@ const galleryDialog = gallery?.querySelector(".gallery-dialog");
 if (typeof galleryDialog?.showModal === "function") {
   const photos = [...gallery.querySelectorAll(".gallery-photo")];
   const fullPhoto = galleryDialog.querySelector(".gallery-full-photo");
+  const message = galleryDialog.querySelector(".gallery-message");
   const position = galleryDialog.querySelector(".gallery-position");
   const controls = galleryDialog.querySelector(".gallery-controls");
   const previewLimit = 5;
   let currentPhoto = 0;
   let opener;
+
+  function updatePhotoState() {
+    if (!fullPhoto.complete) {
+      fullPhoto.hidden = true;
+      message.textContent = "사진을 불러오는 중이에요.";
+      return;
+    }
+
+    const loaded = fullPhoto.naturalWidth > 0;
+    fullPhoto.hidden = !loaded;
+    message.textContent = loaded ? "" : "사진을 불러오지 못했어요.";
+  }
 
   function showPhoto(index) {
     currentPhoto = (index + photos.length) % photos.length;
@@ -16,8 +29,12 @@ if (typeof galleryDialog?.showModal === "function") {
     const description = photo.querySelector("img").alt;
     fullPhoto.alt = description;
     fullPhoto.src = photo.href;
+    updatePhotoState();
     position.textContent = `${currentPhoto + 1} / ${photos.length}`;
   }
+
+  fullPhoto.addEventListener("load", updatePhotoState);
+  fullPhoto.addEventListener("error", updatePhotoState);
 
   for (const [index, photo] of photos.entries()) {
     photo.addEventListener("click", (event) => {

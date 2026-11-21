@@ -4,6 +4,9 @@
   --olive: #4b583f;
   --muted: #555b4e;
   --line: #d3d6c8;
+  --surface: #eeeee5;
+  --control-hover: #e4e8dc;
+  --control-radius: .375rem;
   --serif: "Noto Serif KR", "Songti SC", "AppleMyungjo", Batang, Georgia, serif;
   font-family: system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
   color: var(--ink);
@@ -13,6 +16,11 @@
 * { box-sizing: border-box; }
 
 body { margin: 0; }
+
+::selection {
+  background: var(--olive);
+  color: white;
+}
 
 h1, h2, p, figure, dl, dd { margin: 0; }
 
@@ -25,6 +33,7 @@ h1, h2, p, figure, dl, dd { margin: 0; }
   text-align: center;
   word-break: keep-all;
   overflow-wrap: anywhere;
+  -webkit-tap-highlight-color: #4b583f33;
 }
 
 .cover {
@@ -42,7 +51,7 @@ h1, h2, p, figure, dl, dd { margin: 0; }
 
 .cover-details {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) fit-content(42%);
   grid-template-areas: "copy names";
   align-items: end;
   gap: .75rem;
@@ -123,6 +132,7 @@ h1, h2, p, figure, dl, dd { margin: 0; }
   font-size: 1.5rem;
   font-weight: 500;
   line-height: 1.4;
+  text-wrap: balance;
 }
 
 .section p { line-height: 1.9; }
@@ -138,6 +148,7 @@ h1, h2, p, figure, dl, dd { margin: 0; }
 .family p + p { margin-top: .375rem; }
 
 .gallery {
+  container-type: inline-size;
   padding-bottom: 1.5rem;
 }
 
@@ -145,6 +156,7 @@ h1, h2, p, figure, dl, dd { margin: 0; }
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   grid-auto-rows: clamp(3.75rem, 21vw, 5.75rem);
+  grid-auto-rows: calc((100cqw - 1.125rem) / 4);
   gap: .375rem;
 }
 
@@ -181,10 +193,12 @@ h1, h2, p, figure, dl, dd { margin: 0; }
   object-fit: cover;
 }
 
-.gallery-photo:focus-visible,
-.gallery-dialog button:focus-visible {
+.invitation :focus-visible {
   outline: 2px solid var(--olive);
   outline-offset: 2px;
+}
+
+.gallery-photo:focus-visible {
   z-index: 1;
 }
 
@@ -232,19 +246,64 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   border-radius: 50%;
   background: var(--paper);
   color: var(--olive);
-  font-size: 1.5rem;
-  line-height: 1;
   cursor: pointer;
 }
 
+.gallery-close::before,
+.gallery-close::after,
+.gallery-controls button::before {
+  grid-area: 1 / 1;
+  content: "";
+}
+
+.gallery-close::before,
+.gallery-close::after {
+  width: 1rem;
+  border-top: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.gallery-close::after { transform: rotate(-45deg); }
+
+.gallery-controls button::before {
+  width: .5rem;
+  height: .5rem;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: translateX(-.0625rem) rotate(45deg);
+}
+
+.gallery-controls button[data-gallery-step="-1"]::before {
+  transform: translateX(.0625rem) rotate(-135deg);
+}
+
+.gallery-stage {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  height: min(65vh, 42rem);
+  height: min(65dvh, 42rem, max(5rem, 100dvh - 9rem));
+  border-radius: .5rem;
+  overflow: hidden;
+  background: var(--surface);
+}
+
 .gallery-full-photo {
+  grid-area: 1 / 1;
   display: block;
   width: 100%;
-  height: min(65vh, 42rem);
-  height: min(65dvh, 42rem);
-  border-radius: .5rem;
-  background: var(--paper);
+  height: 100%;
+  min-height: 0;
   object-fit: contain;
+}
+
+.gallery-full-photo[hidden] { display: none; }
+
+.gallery-message {
+  grid-area: 1 / 1;
+  padding-inline: .75rem;
+  color: var(--muted);
+  font-size: .875rem;
 }
 
 .gallery-controls {
@@ -255,7 +314,10 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 }
 
 .gallery-controls[hidden] { display: none; }
-.gallery-position { font-variant-numeric: tabular-nums; }
+.gallery-position {
+  min-width: 5ch;
+  font-variant-numeric: tabular-nums;
+}
 
 .schedule { padding-top: 2.5rem; }
 
@@ -268,7 +330,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   padding: .875rem clamp(.625rem, 4vw, 1.25rem) 1.25rem;
   border: 1px solid var(--line);
   border-radius: .875rem;
-  background: #eeeee5;
+  background: var(--surface);
 }
 
 .calendar {
@@ -300,7 +362,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 
 .wedding-day {
   display: inline-grid;
-  width: 2rem;
+  width: min(100%, 2rem);
   min-height: 2rem;
   place-items: center;
   border-radius: 50%;
@@ -335,27 +397,14 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   margin-top: 1.25rem;
   padding: .5rem 1.25rem;
   border: 1px solid var(--olive);
-  border-radius: .25rem;
+  border-radius: var(--control-radius);
   color: var(--olive);
   text-underline-offset: .2em;
-}
-
-.directions-link:hover { background: #eeeee5; }
-
-.directions-link:focus-visible {
-  outline: 2px solid var(--olive);
-  outline-offset: 3px;
 }
 
 .directions {
   max-width: 22rem;
   margin: 2.5rem auto 0;
-}
-
-.directions h2 {
-  color: var(--ink);
-  font-size: 1.25rem;
-  font-weight: 600;
 }
 
 .venue-map-frame {
@@ -366,7 +415,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   min-height: 12rem;
   overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: .375rem;
+  border-radius: var(--control-radius);
 }
 
 .venue-map-image {
@@ -399,6 +448,11 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   height: 44px;
   line-height: 44px;
   text-decoration: none;
+}
+
+.venue-map .leaflet-control-zoom a:focus-visible {
+  position: relative;
+  z-index: 1;
 }
 
 .venue-map-hint { display: none; }
@@ -456,7 +510,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   line-height: 1.6;
 }
 
-.transport div + div { margin-top: 1rem; }
+.transport > div + div { margin-top: 1.25rem; }
 .transport dt { font-weight: 600; }
 .transport dd {
   margin-top: .25rem;
@@ -473,14 +527,9 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   min-height: max(44px, 2.75rem);
   padding: .5rem .75rem;
   border: 1px solid var(--line);
-  border-radius: .375rem;
+  border-radius: var(--control-radius);
   color: var(--olive);
   cursor: pointer;
-}
-
-.shuttle-photo summary:focus-visible {
-  outline: 2px solid var(--olive);
-  outline-offset: 2px;
 }
 
 .shuttle-photo img {
@@ -492,13 +541,14 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 }
 
 .thanks {
-  padding-top: 5.5rem;
-  padding-bottom: 5.75rem;
+  padding-top: 4rem;
+  padding-bottom: 3rem;
 }
 
-.thanks p { margin-top: 2rem; }
-
-.thanks:has(+ .contacts) { padding-bottom: 2.5rem; }
+.thanks p {
+  margin: 1rem auto 0;
+  text-wrap: pretty;
+}
 
 .contacts { padding-bottom: 2.5rem; }
 
@@ -517,14 +567,14 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 
 .contact-details {
   border: 1px solid var(--line);
-  border-radius: .375rem;
+  border-radius: var(--control-radius);
   text-align: left;
 }
 
 .contact-details summary {
   min-height: max(44px, 2.75rem);
   padding: .5rem .875rem;
-  border-radius: .375rem;
+  border-radius: var(--control-radius);
   color: var(--olive);
   line-height: 1.75;
   cursor: pointer;
@@ -541,12 +591,6 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   min-height: max(44px, 2.75rem);
   color: var(--olive);
   text-underline-offset: .2em;
-}
-
-.contact-details summary:focus-visible,
-.contact-link:focus-visible {
-  outline: 2px solid var(--olive);
-  outline-offset: 2px;
 }
 
 .contact-account { margin-top: .375rem; }
@@ -576,7 +620,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   height: 3.25rem;
   border: 1px solid var(--line);
   border-radius: 50%;
-  background: #eeeee5;
+  background: var(--surface);
 }
 
 .share-icon::before, .share-icon::after {
@@ -594,12 +638,17 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   transform: translate(-28%, -75%) rotate(-45deg);
 }
 
-.share-button:hover .share-icon { background: #e4e8dc; }
+@media (hover: hover) {
+  .directions-link:hover,
+  .gallery-dialog button:hover,
+  .shuttle-photo summary:hover,
+  .contact-details summary:hover { background: var(--surface); }
 
-.share :focus-visible {
-  outline: 2px solid var(--olive);
-  outline-offset: 3px;
+  .share-button:hover .share-icon { background: var(--control-hover); }
 }
+
+.invitation :is(.directions-link, .gallery-dialog button, summary):active,
+.share-button:active .share-icon { background: var(--control-hover); }
 
 .share-status {
   margin-top: .75rem;
@@ -619,4 +668,5 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   background: white;
   color: var(--ink);
   font: inherit;
+  caret-color: var(--olive);
 }

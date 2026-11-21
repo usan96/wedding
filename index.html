@@ -89,12 +89,15 @@
       </div>
       <dialog class="gallery-dialog" aria-label="웨딩 사진 크게 보기">
         <div class="gallery-dialog-content">
-          <button class="gallery-close" type="button" aria-label="사진 닫기" autofocus>×</button>
-          <img class="gallery-full-photo" alt="">
+          <button class="gallery-close" type="button" aria-label="사진 닫기" autofocus></button>
+          <div class="gallery-stage">
+            <img class="gallery-full-photo" alt="" hidden>
+            <p class="gallery-message" role="status"></p>
+          </div>
           <div class="gallery-controls">
-            <button type="button" data-gallery-step="-1" aria-label="이전 사진">‹</button>
+            <button type="button" data-gallery-step="-1" aria-label="이전 사진"></button>
             <p class="gallery-position" role="status"></p>
-            <button type="button" data-gallery-step="1" aria-label="다음 사진">›</button>
+            <button type="button" data-gallery-step="1" aria-label="다음 사진"></button>
           </div>
         </div>
       </dialog>
