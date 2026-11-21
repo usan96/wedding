@@ -428,23 +428,37 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 
 .contacts { padding-bottom: 2.5rem; }
 
-.contact-cards {
+.contacts-message {
+  margin: .75rem auto 1rem;
+  max-width: 18rem;
+  color: var(--muted);
+}
+
+.contact-panels {
   display: grid;
   max-width: 22rem;
   gap: .5rem;
-  margin: 1rem auto 0;
+  margin-inline: auto;
 }
 
-.contact-card {
-  padding: .75rem .875rem;
+.contact-details {
   border: 1px solid var(--line);
   border-radius: .375rem;
   text-align: left;
 }
 
-.contact-card h3 {
-  margin: 0;
-  font-size: 1rem;
+.contact-details summary {
+  min-height: max(44px, 2.75rem);
+  padding: .5rem .875rem;
+  border-radius: .375rem;
+  color: var(--olive);
+  line-height: 1.75;
+  cursor: pointer;
+}
+
+.contact-card {
+  padding: .375rem .875rem .75rem;
+  border-top: 1px solid var(--line);
 }
 
 .contact-link {
@@ -455,6 +469,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   text-underline-offset: .2em;
 }
 
+.contact-details summary:focus-visible,
 .contact-link:focus-visible {
   outline: 2px solid var(--olive);
   outline-offset: 2px;

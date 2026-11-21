@@ -628,7 +628,7 @@ def render_transport(invitation):
 
 
 def render_contacts(invitation):
-    cards = []
+    panels = []
     for field, account, label in (
         ("groom_phone", invitation.groom_account, "신랑 측"),
         ("bride_phone", invitation.bride_account, "신부 측"),
@@ -636,34 +636,33 @@ def render_contacts(invitation):
         display_number = getattr(invitation, field).strip()
         if not display_number and account is None:
             continue
-        cards.append(f'        <div class="contact-card">\n          <h3>{label}</h3>\n')
+        panels.append(
+            '        <details class="contact-details">\n'
+            f'          <summary>{label}</summary>\n'
+            '          <div class="contact-card">\n'
+        )
         if display_number:
             dial_number = re.sub(r"[ ().-]", "", display_number)
             if not re.fullmatch(r"\+?[0-9]{7,15}", dial_number):
                 raise InputError(f"{field} — 010-0000-0000과 같은 형식으로 전화번호를 입력해 주세요.")
-            cards.append(
-                f'          <a class="contact-link" href="tel:{dial_number}">'
+            panels.append(
+                f'            <a class="contact-link" href="tel:{dial_number}">'
                 f'{escape(display_number)}</a>\n'
             )
         if account is not None:
-            cards.append(
-                f'          <p class="contact-account">{escape(account.bank)} {escape(account.number)}'
+            panels.append(
+                f'            <p class="contact-account">{escape(account.bank)} {escape(account.number)}'
                 f'<br><span>예금주 {escape(account.holder)}</span></p>\n'
             )
-        cards.append('        </div>\n')
-    if not cards:
+        panels.append('          </div>\n        </details>\n')
+    if not panels:
         return ""
-    title_parts = []
-    if invitation.groom_phone.strip() or invitation.bride_phone.strip():
-        title_parts.append("연락처")
-    if invitation.groom_account is not None or invitation.bride_account is not None:
-        title_parts.append("계좌 안내")
-    title = " · ".join(title_parts)
     return (
         '    <section class="section contacts" aria-labelledby="contacts-title">\n'
-        f'      <h2 id="contacts-title">{title}</h2>\n'
-        '      <div class="contact-cards">\n'
-        + "".join(cards)
+        '      <h2 id="contacts-title">마음 전하실 곳</h2>\n'
+        '      <p class="contacts-message">따뜻한 마음으로 저희의 시작을 응원해 주셔서 감사합니다.</p>\n'
+        '      <div class="contact-panels">\n'
+        + "".join(panels)
         + '      </div>\n'
         '    </section>\n\n'
     )
