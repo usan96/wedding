@@ -4,6 +4,7 @@
   --olive: #4b583f;
   --muted: #555b4e;
   --line: #d3d6c8;
+  --control-line: #7c846f;
   --surface: #eeeee5;
   --control-hover: #e4e8dc;
   --control-radius: .375rem;
@@ -399,7 +400,7 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
   border: 1px solid var(--olive);
   border-radius: var(--control-radius);
   color: var(--olive);
-  text-underline-offset: .2em;
+  text-decoration: none;
 }
 
 .directions {
@@ -521,15 +522,47 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 
 .shuttle-photo { margin-top: .5rem; }
 
-.shuttle-photo summary {
-  width: fit-content;
-  max-width: 100%;
+.invitation :is(.shuttle-photo, .contact-details) > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
   min-height: max(44px, 2.75rem);
-  padding: .5rem .75rem;
-  border: 1px solid var(--line);
+  padding: .5rem .875rem;
   border-radius: var(--control-radius);
   color: var(--olive);
+  line-height: 1.6;
+  list-style: none;
   cursor: pointer;
+}
+
+.invitation :is(.shuttle-photo, .contact-details) > summary::-webkit-details-marker {
+  display: none;
+}
+
+.invitation :is(.shuttle-photo, .contact-details) > summary::after {
+  flex: none;
+  width: .5rem;
+  height: .5rem;
+  margin-inline: .125rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-.125rem) rotate(45deg);
+  content: "";
+}
+
+.invitation :is(.shuttle-photo, .contact-details)[open] > summary {
+  background: var(--surface);
+}
+
+.invitation :is(.shuttle-photo, .contact-details)[open] > summary::after {
+  transform: translateY(.125rem) rotate(225deg);
+}
+
+.shuttle-photo > summary {
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid var(--control-line);
 }
 
 .shuttle-photo img {
@@ -566,18 +599,14 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 }
 
 .contact-details {
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-line);
   border-radius: var(--control-radius);
   text-align: left;
 }
 
-.contact-details summary {
-  min-height: max(44px, 2.75rem);
-  padding: .5rem .875rem;
-  border-radius: var(--control-radius);
-  color: var(--olive);
-  line-height: 1.75;
-  cursor: pointer;
+.contact-details[open] > summary {
+  border-end-start-radius: 0;
+  border-end-end-radius: 0;
 }
 
 .contact-card {
@@ -640,14 +669,14 @@ body:has(.gallery-dialog[open]) { overflow: hidden; }
 
 @media (hover: hover) {
   .directions-link:hover,
-  .gallery-dialog button:hover,
-  .shuttle-photo summary:hover,
-  .contact-details summary:hover { background: var(--surface); }
+  .gallery-dialog button:hover { background: var(--surface); }
 
+  .invitation :is(.shuttle-photo, .contact-details) > summary:hover { background: var(--surface); }
   .share-button:hover .share-icon { background: var(--control-hover); }
 }
 
-.invitation :is(.directions-link, .gallery-dialog button, summary):active,
+.invitation :is(.directions-link, .gallery-dialog button):active,
+.invitation :is(.shuttle-photo, .contact-details) > summary:active,
 .share-button:active .share-icon { background: var(--control-hover); }
 
 .share-status {
