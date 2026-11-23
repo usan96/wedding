@@ -15,7 +15,10 @@ $draft_note    <header class="cover">
         <img src="$photo_url" alt="$photo_alt" fetchpriority="high">
       </div>
       <div class="cover-details">
-        <h1 class="cover-title"><span class="visually-hidden">$groom_name · $bride_name </span><span lang="en">Our<br>Wedding Day</span></h1>
+        <h1 class="cover-title$cover_title_class" style="--cover-title-scale: $cover_title_scale">
+          <span class="visually-hidden">$groom_name · $bride_name </span>
+          <img lang="en" src="$cover_title_url" width="1104" height="480" alt="Our Wedding Day">
+        </h1>
         <p class="cover-date"><time datetime="$event_datetime">$cover_date</time></p>
       </div>
     </header>

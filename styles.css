@@ -4,12 +4,6 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: Satisfy;
-  src: url("./assets/fonts/satisfy.woff2") format("woff2");
-  font-display: swap;
-}
-
 :root {
   --paper: #fdfdfd;
   --surround: #f8fbff;
@@ -96,10 +90,19 @@ button, summary { cursor: pointer; }
   padding-inline: 12px;
 }
 
-.cover-title {
-  color: var(--deep-red);
-  font: 400 clamp(2.5rem, 13.85cqw, 3.375rem) / 1.11 Satisfy, cursive;
-  transform: translateY(-4px) scaleX(0.985);
+.cover-title img {
+  width: calc(70.77cqw * var(--cover-title-scale, 1));
+  height: auto;
+  margin-inline: auto;
+  transform: translateY(-4px);
+}
+
+.cover-title--bold img {
+  filter:
+    drop-shadow(0.4px 0 0 var(--deep-red))
+    drop-shadow(-0.4px 0 0 var(--deep-red))
+    drop-shadow(0 0.4px 0 var(--deep-red))
+    drop-shadow(0 -0.4px 0 var(--deep-red));
 }
 
 .cover-date {

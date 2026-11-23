@@ -1,6 +1,9 @@
 {
   "status": "confirmed",
   "background_color": "#fdfdfd",
+  "cover_title_font": "blacksword",
+  "cover_title_scale": 1.30,
+  "cover_title_bold": false,
   "groom_name": "김병남",
   "groom_phone": "010-2699-5627",
   "groom_account": {

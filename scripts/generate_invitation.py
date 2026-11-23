@@ -48,6 +48,7 @@ INPUT_FIELDS = {
     *REQUIRED_TEXT_FIELDS, *OPTIONAL_TEXT_FIELDS,
     "status", "date", "time", "directions", "directions_url", "cover_photo", "gallery_photos",
     "background_color", "groom_account", "bride_account", "shuttle_photo", "gallery_order",
+    "cover_title_font", "cover_title_scale", "cover_title_bold",
 }
 ACCOUNT_FIELDS = ("bank", "number", "holder")
 DIRECTIONS_FIELDS = {"latitude", "longitude", "map_image", "naver_place_url", "tmap_place_url"}
@@ -55,10 +56,12 @@ NAVER_PLACE_HOSTS = {"map.naver.com", "m.map.naver.com", "m.place.naver.com", "n
 TMAP_PLACE_HOSTS = {"tmap.life", "poi.tmobiweb.com"}
 LEAFLET_ASSETS = Path("vendor/leaflet")
 FONT_ASSETS = Path("assets/fonts")
-INVITATION_FONTS = (
-    "gowun-dodum.woff2", "gowun-dodum-OFL.txt",
-    "satisfy.woff2", "satisfy-LICENSE.txt",
-)
+INVITATION_FONTS = ("gowun-dodum.woff2", "gowun-dodum-OFL.txt")
+DEFAULT_COVER_TITLE_FONT = "qillsey-einstein"
+COVER_TITLE_IMAGES = {
+    "blacksword": Path("assets/cover-title-blacksword.webp"),
+    "qillsey-einstein": Path("assets/cover-title.webp"),
+}
 LEAFLET_TAGS = (
     '  <link rel="stylesheet" href="./vendor/leaflet/leaflet.css">\n'
     '  <script src="./vendor/leaflet/leaflet.js" defer></script>\n'
@@ -120,6 +123,9 @@ class Invitation:
     groom_account: Account | None = None
     bride_account: Account | None = None
     shuttle_photo: Path | None = None
+    cover_title_font: str = DEFAULT_COVER_TITLE_FONT
+    cover_title_scale: float = 1.0
+    cover_title_bold: bool = False
 
 
 class JsonObject(dict):
@@ -502,6 +508,16 @@ def load_invitation():
     background_color = text_field(values, "background_color", optional=True).strip() or DEFAULT_BACKGROUND_COLOR
     if not re.fullmatch(r"#[0-9a-fA-F]{6}", background_color):
         raise InputError("background_color — #f8f6f0처럼 # 뒤에 6자리 색상 코드를 입력해 주세요.")
+    cover_title_font = values.get("cover_title_font", DEFAULT_COVER_TITLE_FONT)
+    if not isinstance(cover_title_font, str) or cover_title_font not in COVER_TITLE_IMAGES:
+        choices = ", ".join(COVER_TITLE_IMAGES)
+        raise InputError(f"cover_title_font — {choices} 중 하나를 입력해 주세요.")
+    cover_title_scale = values.get("cover_title_scale", 1.0)
+    if type(cover_title_scale) not in (int, float) or not 0.5 <= cover_title_scale <= 1.3:
+        raise InputError("cover_title_scale — 0.5 이상 1.3 이하의 숫자를 입력해 주세요.")
+    cover_title_bold = values.get("cover_title_bold", False)
+    if not isinstance(cover_title_bold, bool):
+        raise InputError("cover_title_bold — true 또는 false를 입력해 주세요.")
     if status == "confirmed":
         for field, example in EXAMPLE_TEXT.items():
             if values.get(field, "").strip() == example:
@@ -519,6 +535,9 @@ def load_invitation():
         **required,
         **optional,
         background_color=background_color,
+        cover_title_font=cover_title_font,
+        cover_title_scale=cover_title_scale,
+        cover_title_bold=cover_title_bold,
         groom_account=load_account(values, "groom_account"),
         bride_account=load_account(values, "bride_account"),
         date=parse_date(text_field(values, "date")),
@@ -799,6 +818,9 @@ def render(invitation, photo_path, gallery, map_path=None, shuttle_photo_path=No
         photo_alt=escape(photo_alt),
         groom_name=groom,
         bride_name=bride,
+        cover_title_url="./" + COVER_TITLE_IMAGES[invitation.cover_title_font].as_posix(),
+        cover_title_scale=invitation.cover_title_scale,
+        cover_title_class=" cover-title--bold" if invitation.cover_title_bold else "",
         cover_date=f"{event_date:%Y.%m.%d}.{'MON TUE WED THU FRI SAT SUN'.split()[event_date.weekday()]} "
                    f"{event_time.hour % 12 or 12:02d}:{event_time.minute:02d}{'AM' if period == '오전' else 'PM'}",
         schedule_date=f"{event_date.year}년 {event_date.month}월 {event_date.day}일 {weekday}요일",
@@ -865,6 +887,8 @@ def write_publish_bundle(invitation, output):
         (bundle / FONT_ASSETS).mkdir()
         for font in INVITATION_FONTS:
             shutil.copyfile(ROOT / FONT_ASSETS / font, bundle / FONT_ASSETS / font)
+        cover_title_image = COVER_TITLE_IMAGES[invitation.cover_title_font]
+        shutil.copyfile(ROOT / cover_title_image, bundle / cover_title_image)
         shutil.copytree(ROOT / LEAFLET_ASSETS, bundle / LEAFLET_ASSETS)
         shutil.copyfile(invitation.cover_photo, bundle / photo_path)
         shutil.copyfile(directions.map_image, bundle / map_path)

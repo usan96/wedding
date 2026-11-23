@@ -6,6 +6,9 @@
 | --- | --- |
 | `status` | 초안 검토 중에는 `"draft"` |
 | `background_color` | 청첩장 본문의 배경색. `"#fdfdfd"`처럼 6자리 색상 코드를 입력합니다. |
+| `cover_title_font` | ‘Our Wedding Day’ 서체. `"blacksword"` 또는 `"qillsey-einstein"`을 입력합니다. 기본값은 `"qillsey-einstein"`입니다. [Blacksword 제작자 안내](https://www.dafont.com/blacksword.font) |
+| `cover_title_scale` | ‘Our Wedding Day’ 크기 배율. `1`이 기본 크기이며 `0.5`부터 `1.3`까지 입력할 수 있습니다. |
+| `cover_title_bold` | `true`는 제목의 획을 굵게 표시하고, `false`는 원래 굵기로 표시합니다. 기본값은 `false`입니다. |
 | `groom_name`, `bride_name` | `"예시 신랑"`, `"예시 신부"` |
 | `groom_father_name`, `groom_mother_name` | 신랑 아버지와 어머니 성함 |
 | `bride_father_name`, `bride_mother_name` | 신부 아버지와 어머니 성함 |
