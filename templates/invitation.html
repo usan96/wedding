@@ -17,7 +17,16 @@ $draft_note    <header class="cover">
       <div class="cover-details">
         <h1 class="cover-title$cover_title_class" style="--cover-title-scale: $cover_title_scale">
           <span class="visually-hidden">$groom_name · $bride_name </span>
-          <img lang="en" src="$cover_title_url" width="1104" height="480" alt="Our Wedding Day">
+          <svg class="cover-lettering" lang="en" role="img" aria-label="Our Wedding Day" viewBox="0 0 1104 480" width="1104" height="480">
+            <defs>
+              <mask id="cover-ink" maskUnits="userSpaceOnUse" x="0" y="0" width="1104" height="480"
+                fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round">
+$cover_title_strokes
+                <rect class="cover-ink-complete" width="1104" height="480" fill="white" stroke="none"/>
+              </mask>
+            </defs>
+            <image href="$cover_title_url" width="1104" height="480"/>
+          </svg>
         </h1>
         <p class="cover-date"><time datetime="$event_datetime">$cover_date</time></p>
       </div>

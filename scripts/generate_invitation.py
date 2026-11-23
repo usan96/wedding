@@ -837,6 +837,8 @@ def render(invitation, photo_path, gallery, map_path=None, shuttle_photo_path=No
         contacts=render_contacts(invitation),
     )
     try:
+        cover_ink_file = TEMPLATE_FILE.parent / f"cover-ink-{invitation.cover_title_font}.svg"
+        values["cover_title_strokes"] = cover_ink_file.read_text(encoding="utf-8").rstrip()
         template = Template(TEMPLATE_FILE.read_text(encoding="utf-8"))
         return template.substitute(values)
     except (KeyError, ValueError) as error:

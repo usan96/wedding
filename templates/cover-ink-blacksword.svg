@@ -1,0 +1,42 @@
+                <path pathLength="1" stroke-width="18" style="--ink-duration: 306ms"
+                  d="M393 104 C365 100 408 44 467 17 C509 -1 548 1 557 33 C569 87 506 151 454 175 C418 193 382 196 384 161 C387 126 438 66 488 44 C506 36 521 37 528 47"/>
+                <path pathLength="1" stroke-width="22" style="--ink-delay: 306ms; --ink-duration: 86ms"
+                  d="M587 89 C574 100 540 145 549 149 C557 154 609 103 626 89"/>
+                <path pathLength="1" stroke-width="22" style="--ink-delay: 392ms; --ink-duration: 90ms"
+                  d="M629 89 C617 99 583 143 595 150 C602 154 633 122 648 109"/>
+                <path pathLength="1" stroke-width="23" style="--ink-delay: 482ms; --ink-duration: 90ms"
+                  d="M672 90 C658 101 632 139 632 152 C645 131 685 99 710 88 C707 96 683 116 688 123 C694 133 722 106 726 104"/>
+                <path pathLength="1" stroke-width="28" style="--ink-delay: 605ms; --ink-duration: 198ms"
+                  d="M32 319 C2 319 59 255 112 236 C172 214 170 249 133 309 C116 339 87 378 83 396 C101 358 176 287 215 270 C208 285 150 357 157 388 C163 410 219 349 252 305 C280 267 300 215 274 225 L264 229"/>
+                <path pathLength="1" stroke-width="19" style="--ink-delay: 803ms; --ink-duration: 97ms"
+                  d="M248 350 C264 353 304 318 307 308 C289 302 249 338 246 359 C241 382 283 364 319 333"/>
+                <path pathLength="1" stroke-width="18" style="--ink-delay: 900ms; --ink-duration: 90ms"
+                  d="M379 307 C368 296 325 324 311 347 C296 368 305 378 332 356 C354 337 370 322 385 307"/>
+                <path pathLength="1" stroke-width="23" style="--ink-delay: 990ms; --ink-duration: 79ms"
+                  d="M431 251 C414 250 382 306 363 337 C332 391 365 364 388 344"/>
+                <path pathLength="1" stroke-width="18" style="--ink-delay: 1069ms; --ink-duration: 83ms"
+                  d="M457 307 C446 297 405 324 389 350 C365 387 401 364 432 333 L460 306"/>
+                <path pathLength="1" stroke-width="24" style="--ink-delay: 1152ms; --ink-duration: 83ms"
+                  d="M513 249 C497 248 463 306 443 339 C414 390 447 364 467 345"/>
+                <path pathLength="1" stroke-width="23" style="--ink-delay: 1235ms; --ink-duration: 58ms"
+                  d="M505 312 C491 325 463 359 472 367 C479 373 509 344 525 327"/>
+                <path pathLength="1" stroke-width="23" style="--ink-delay: 1292ms; --ink-duration: 47ms"
+                  d="M524 285 L512 298"/>
+                <path pathLength="1" stroke-width="23" style="--ink-delay: 1339ms; --ink-duration: 94ms"
+                  d="M551 309 C534 325 510 356 510 370 C525 349 575 309 588 310 C574 325 547 359 557 367 C563 373 590 351 609 333"/>
+                <path pathLength="1" stroke-width="17" style="--ink-delay: 1433ms; --ink-duration: 72ms"
+                  d="M669 318 C670 282 604 330 592 353 C576 384 611 359 653 327"/>
+                <path pathLength="1" stroke-width="23" style="--ink-delay: 1505ms; --ink-duration: 76ms"
+                  d="M655 328 C624 376 592 438 561 445 C529 452 555 395 665 352"/>
+                <path pathLength="1" stroke-width="24" style="--ink-delay: 1595ms; --ink-duration: 122ms"
+                  d="M884 257 C870 252 836 297 813 332 C808 340 794 364 805 357 L815 353"/>
+                <path pathLength="1" stroke-width="20" style="--ink-delay: 1714ms; --ink-duration: 288ms"
+                  d="M776 292 C741 274 808 235 855 234 C904 230 940 251 932 286 C925 327 871 363 818 384 C778 399 725 409 714 394 C704 380 727 354 781 330"/>
+                <path pathLength="1" stroke-width="18" style="--ink-delay: 2002ms; --ink-duration: 104ms"
+                  d="M994 318 C1000 288 944 315 923 345 C905 374 916 375 938 357 C954 345 970 329 985 324"/>
+                <path pathLength="1" stroke-width="21" style="--ink-delay: 2106ms; --ink-duration: 94ms"
+                  d="M985 324 C972 337 950 364 964 367 C973 369 999 345 1014 331"/>
+                <path pathLength="1" stroke-width="22" style="--ink-delay: 2200ms; --ink-duration: 112ms"
+                  d="M1038 310 C1021 327 992 364 1002 367 C1009 372 1045 337 1069 316"/>
+                <path pathLength="1" stroke-width="23" style="--ink-delay: 2311ms; --ink-duration: 162ms"
+                  d="M1082 310 C1066 315 1021 391 1004 422 C983 460 1005 441 1016 426 C1027 410 1039 394 1052 384"/>

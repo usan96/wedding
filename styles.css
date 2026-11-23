@@ -98,19 +98,42 @@ button, summary { cursor: pointer; }
   padding-inline: 12px;
 }
 
-.cover-title img {
+.cover-lettering {
   width: calc(70.77cqw * var(--cover-title-scale, 1));
   height: auto;
   margin-inline: auto;
   transform: translateY(-4px);
 }
 
-.cover-title--bold img {
+.cover-title--bold .cover-lettering {
   filter:
     drop-shadow(0.4px 0 0 var(--deep-red))
     drop-shadow(-0.4px 0 0 var(--deep-red))
     drop-shadow(0 0.4px 0 var(--deep-red))
     drop-shadow(0 -0.4px 0 var(--deep-red));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cover-lettering image { mask: url(#cover-ink); }
+
+  .cover-lettering path {
+    stroke-dasharray: 1 1;
+    animation: cover-write var(--ink-duration) linear var(--ink-delay, 0ms) both;
+  }
+
+  .cover-ink-complete {
+    animation: cover-ink-complete 0ms 2500ms both;
+  }
+}
+
+@keyframes cover-write {
+  from { visibility: hidden; stroke-dashoffset: 1; }
+  to { visibility: visible; stroke-dashoffset: 0; }
+}
+
+@keyframes cover-ink-complete {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .cover-date {

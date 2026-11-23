@@ -1,0 +1,38 @@
+                <path pathLength="1" stroke-width="20" style="--ink-duration: 410ms"
+                  d="M490 91 C463 105 423 126 412 92 C398 61 485 -1 514 10 C600 15 534 137 449 184 C419 201 406 177 420 145 C435 111 473 51 513 57"/>
+                <path pathLength="1" stroke-width="17" style="--ink-delay: 410ms; --ink-duration: 100ms"
+                  d="M573 104 C562 116 539 148 547 154 C551 160 595 119 611 105"/>
+                <path pathLength="1" stroke-width="20" style="--ink-delay: 510ms; --ink-duration: 105ms"
+                  d="M610 104 C597 119 571 151 582 157 C590 162 624 132 637 111"/>
+                <path pathLength="1" stroke-width="20" style="--ink-delay: 614ms; --ink-duration: 118ms"
+                  d="M641 97 C639 118 610 148 604 159 C618 139 660 97 673 101 C683 105 653 130 659 139 C663 147 686 118 697 110"/>
+                <path pathLength="1" stroke-width="25" style="--ink-delay: 764ms; --ink-duration: 228ms"
+                  d="M163 254 C181 250 146 305 125 344 C109 374 88 417 104 390 C128 361 197 290 229 280 C203 312 161 382 167 415 C170 428 181 433 189 408 C211 348 281 248 318 223 C327 216 334 223 322 241"/>
+                <path pathLength="1" stroke-width="14" style="--ink-delay: 992ms; --ink-duration: 100ms"
+                  d="M248 356 C263 368 308 325 298 325 C282 315 242 350 245 374 C249 396 284 374 309 351"/>
+                <path pathLength="1" stroke-width="15" style="--ink-delay: 1092ms; --ink-duration: 96ms"
+                  d="M349 322 C332 313 303 344 295 365 C288 387 304 382 325 362 C339 348 353 332 364 318"/>
+                <path pathLength="1" stroke-width="18" style="--ink-delay: 1188ms; --ink-duration: 109ms"
+                  d="M302 377 C344 346 448 272 432 254 C425 247 388 282 364 313 C339 346 324 373 338 378 C347 383 368 363 386 347"/>
+                <path pathLength="1" stroke-width="16" style="--ink-delay: 1297ms; --ink-duration: 91ms"
+                  d="M434 323 C418 313 377 347 366 363 C352 389 380 377 400 357 C420 339 446 310 491 301"/>
+                <path pathLength="1" stroke-width="20" style="--ink-delay: 1388ms; --ink-duration: 109ms"
+                  d="M363 377 C414 355 520 263 502 252 C490 244 453 286 430 319 C405 355 395 377 406 381 C417 384 430 371 447 355"/>
+                <path pathLength="1" stroke-width="19" style="--ink-delay: 1497ms; --ink-duration: 73ms"
+                  d="M468 328 C455 343 433 371 440 380 C447 388 476 356 492 341"/>
+                <path pathLength="1" stroke-width="19" style="--ink-delay: 1570ms; --ink-duration: 105ms"
+                  d="M506 325 C486 346 464 372 469 384 C480 369 526 324 536 324 C541 325 500 366 506 379 C514 390 540 361 551 347"/>
+                <path pathLength="1" stroke-width="16" style="--ink-delay: 1674ms; --ink-duration: 77ms"
+                  d="M604 335 C601 309 578 318 552 345 C531 365 527 387 545 375 C557 370 584 345 598 333"/>
+                <path pathLength="1" stroke-width="19" style="--ink-delay: 1752ms; --ink-duration: 132ms"
+                  d="M596 335 C599 355 565 402 535 442 C511 476 484 486 494 455 C508 425 578 370 627 335"/>
+                <path pathLength="1" stroke-width="20" style="--ink-delay: 1884ms; --ink-duration: 86ms"
+                  d="M817 259 C807 253 777 291 756 321 C739 345 723 374 735 374"/>
+                <path pathLength="1" stroke-width="18" style="--ink-delay: 1970ms; --ink-duration: 155ms"
+                  d="M733 375 C730 356 827 265 870 254 C927 232 870 317 830 352 C801 380 716 415 681 394 C674 389 671 380 680 373"/>
+                <path pathLength="1" stroke-width="15" style="--ink-delay: 2125ms; --ink-duration: 114ms"
+                  d="M916 333 C898 298 872 339 850 363 C839 388 862 377 880 362 C892 351 905 340 912 335 C904 346 882 374 887 380 C894 389 925 354 936 344"/>
+                <path pathLength="1" stroke-width="18" style="--ink-delay: 2239ms; --ink-duration: 86ms"
+                  d="M947 329 C937 344 909 376 924 379 C938 386 968 350 978 336"/>
+                <path pathLength="1" stroke-width="18" style="--ink-delay: 2325ms; --ink-duration: 127ms"
+                  d="M978 336 C987 348 945 410 926 433 C906 459 882 481 875 469 C864 451 903 416 923 397 C947 375 990 347 1009 334"/>
