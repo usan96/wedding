@@ -448,7 +448,6 @@ button, summary { cursor: pointer; }
   display: flex;
   width: min(100%, 285px);
   margin: 22px auto 0;
-  border: 1px solid #e5e4e7;
   border-radius: 30px;
 }
 
@@ -488,8 +487,13 @@ button, summary { cursor: pointer; }
 }
 
 .transport-details, .contact-details {
-  border: 1px solid var(--line);
   border-radius: 5px;
+}
+
+.contact-details { border: 1px solid var(--line); }
+
+.directions-actions, .transport-details {
+  border: 1px solid #91848a;
 }
 
 .transport-details summary, .contact-details summary {
