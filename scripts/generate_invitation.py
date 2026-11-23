@@ -884,6 +884,8 @@ def write_publish_bundle(invitation, output):
         (bundle / "index.html").write_text(page, encoding="utf-8")
         for asset in ("styles.css", "invitation.js"):
             shutil.copyfile(ROOT / asset, bundle / asset)
+        paper_texture = Path("assets/paper-texture.png")
+        shutil.copyfile(ROOT / paper_texture, bundle / paper_texture)
         (bundle / FONT_ASSETS).mkdir()
         for font in INVITATION_FONTS:
             shutil.copyfile(ROOT / FONT_ASSETS / font, bundle / FONT_ASSETS / font)

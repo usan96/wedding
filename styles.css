@@ -6,6 +6,7 @@
 
 :root {
   --paper: #fdfdfd;
+  --paper-texture: url("./assets/paper-texture.png");
   --surround: #f8fbff;
   --ink: #48464a;
   --muted: #747177;
@@ -44,7 +45,7 @@ button, summary { cursor: pointer; }
   min-height: 100vh;
   margin-inline: auto;
   container-type: inline-size;
-  background: var(--paper);
+  background: var(--paper) var(--paper-texture);
   box-shadow: 0 7px 40px rgb(30 42 62 / 9%);
   text-align: center;
   -webkit-text-stroke: 0.13px;
@@ -61,7 +62,7 @@ button, summary { cursor: pointer; }
 .cover {
   position: relative;
   aspect-ratio: 390 / 748;
-  background: #fff;
+  background: #fff var(--paper-texture);
 }
 
 .portrait,
@@ -82,6 +83,13 @@ button, summary { cursor: pointer; }
 .portrait::after {
   content: "";
   background: linear-gradient(180deg, transparent 70%, rgb(255 255 255 / 56%) 81%, #fff 88%);
+}
+
+@supports (mask-image: linear-gradient(#000, #000)) {
+  .portrait::after {
+    background: #fff var(--paper-texture);
+    mask-image: linear-gradient(180deg, transparent 70%, rgb(0 0 0 / 56%) 81%, #000 88%);
+  }
 }
 
 .cover-details {
