@@ -20,6 +20,7 @@
 | `cover_photo` | 확정 사진의 상대 경로 `"assets/gallery/우리 사진.jpg"`. JPG, PNG, WebP 사용 가능 |
 | `gallery_order` | 선택 항목. 공개할 갤러리 사진 경로를 표시 순서대로 배열에 입력합니다. |
 | `venue_hall`, `venue_floor` | 선택 항목 `"예시 홀"`, `"2층"` |
+| `subway`, `car`, `bus` | 지하철·자차·버스 이용 안내. 여러 줄은 문자열 안에 `\n`을 넣어 구분합니다. 빈 문자열이면 해당 안내를 생략합니다. |
 | `parking`, `shuttle` | 지도 버튼 아래에 표시할 주차와 셔틀 안내. 여러 줄은 문자열 안에 `\n`을 넣어 구분합니다. |
 | `shuttle_photo` | 선택 항목. `"assets/shuttle-stop.jpg"`처럼 탑승지 사진의 상대 경로를 입력하면 셔틀 안내 아래에서 눌러 볼 수 있습니다. |
 | `cover_photo_alt` | 선택 항목 `"예식장 정원에서 촬영한 웨딩 사진"` |

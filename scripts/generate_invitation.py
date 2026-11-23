@@ -34,7 +34,7 @@ REQUIRED_TEXT_FIELDS = ("groom_name", "bride_name", "venue_name", "venue_address
 OPTIONAL_TEXT_FIELDS = (
     "venue_hall", "venue_floor", "cover_photo_alt",
     "groom_father_name", "groom_mother_name", "bride_father_name", "bride_mother_name",
-    "parking", "shuttle", "groom_phone", "bride_phone",
+    "subway", "car", "bus", "parking", "shuttle", "groom_phone", "bride_phone",
 )
 EXAMPLE_TEXT = {
     "groom_name": "예시 신랑",
@@ -116,6 +116,9 @@ class Invitation:
     groom_mother_name: str = ""
     bride_father_name: str = ""
     bride_mother_name: str = ""
+    subway: str = ""
+    car: str = ""
+    bus: str = ""
     parking: str = ""
     shuttle: str = ""
     groom_phone: str = ""
@@ -689,13 +692,17 @@ def render_parents(invitation):
 
 def render_transport(invitation, shuttle_photo_path):
     entries = []
-    if invitation.directions is not None:
-        transit = escape(invitation.directions.naver_place_url)
-        for label, service in (("지하철 이용 시", "지하철"), ("자차 이용 시", "자동차"), ("버스 이용 시", "버스")):
+    for label, description in (
+        ("지하철 이용 시", invitation.subway),
+        ("자차 이용 시", invitation.car),
+        ("버스 이용 시", invitation.bus),
+    ):
+        description = escape(description.strip())
+        if description:
             entries.append(
                 '        <details class="transport-details">\n'
                 f'          <summary>{label}</summary>\n'
-                f'          <p class="transport-description"><a href="{transit}">네이버지도에서 {service} 길찾기</a></p>\n'
+                f'          <p class="transport-description">{description}</p>\n'
                 '        </details>\n'
             )
     parking = escape(invitation.parking.strip())
