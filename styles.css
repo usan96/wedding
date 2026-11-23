@@ -508,13 +508,13 @@ button, summary { cursor: pointer; }
   text-align: start;
 }
 
-.transport-details { border-radius: 5px; }
+.transport-details, .contact-card { border-radius: 5px; }
 
-.directions-actions, .transport-details {
+.directions-actions, .transport-details, .contact-card {
   border: 1px solid #91848a;
 }
 
-.transport-details summary, .contact-card > summary {
+:is(.transport-details, .contact-card) > summary {
   display: flex;
   min-height: 58px;
   align-items: center;
@@ -557,12 +557,6 @@ summary::-webkit-details-marker { display: none; }
 
 .contacts { padding-top: 125px; }
 .contact-panels { margin-top: 24px; }
-.contact-card {
-  border: 1px solid var(--line);
-  border-radius: 5px;
-}
-
-.contact-card > summary { min-height: 46px; padding-block: 10px; }
 .contact-content { padding: 0 16px 15px; }
 
 .contact-link { display: inline-block; padding-block: 9px; }
