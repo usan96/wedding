@@ -19,7 +19,7 @@
 | `date`, `time` | 예식장 현지 날짜와 24시간제 시작 시각 `"2027-03-13"`, `"14:30"` |
 | `venue_name`, `venue_address` | `"예시 웨딩홀"`, `"예시 주소"` |
 | `directions` | 예식장 좌표, 대표 지도 이미지와 서비스별 장소 링크 |
-| `cover_photo` | 확정 사진의 상대 경로 `"assets/gallery/우리 사진.jpg"`. JPG, PNG, WebP 사용 가능 |
+| `cover_photo` | 표지와 링크 공유 미리보기에 사용할 사진의 상대 경로 `"assets/gallery/우리 사진.jpg"`. JPG, PNG, WebP 사용 가능 |
 | `gallery_order` | 선택 항목. 공개할 갤러리 사진 경로를 표시 순서대로 배열에 입력합니다. |
 | `venue_hall`, `venue_floor` | 선택 항목 `"예시 홀"`, `"2층"` |
 | `subway`, `car`, `bus` | 지하철·자차·버스 이용 안내. 여러 줄은 문자열 안에 `\n`을 넣어 구분합니다. 빈 문자열이면 해당 안내를 생략합니다. |

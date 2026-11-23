@@ -30,6 +30,7 @@ ASSETS_DIR = ROOT / "assets"
 GALLERY_DIR = ASSETS_DIR / "gallery"
 PHOTO_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 DEFAULT_BACKGROUND_COLOR = "#fdfdfd"
+DEFAULT_SITE_URL = "https://usan96.github.io/wedding/"
 REQUIRED_TEXT_FIELDS = ("groom_name", "bride_name", "venue_name", "venue_address")
 OPTIONAL_TEXT_FIELDS = (
     "venue_hall", "venue_floor", "cover_photo_alt", "share_title", "share_description",
@@ -823,17 +824,21 @@ def render(invitation, photo_path, gallery, map_path=None, shuttle_photo_path=No
         if value.strip()
     )
     photo_alt = invitation.cover_photo_alt or ("예시 웨딩 사진" if sample else "웨딩 사진")
+    photo_url = quote(photo_path.as_posix())
+    site_url = (os.environ.get("WEDDING_SITE_URL", "").strip() or DEFAULT_SITE_URL).rstrip("/") + "/"
 
     values = dict(
         share_title=escape(share_title),
         share_description=escape(share_description),
+        share_url=escape(site_url),
+        share_image_url=escape(site_url + photo_url),
         background_color=escape(invitation.background_color),
         robots='  <meta name="robots" content="noindex">\n' if draft else "",
         leaflet_tags=LEAFLET_TAGS if invitation.directions else "",
         draft_attribute=" data-draft" if draft else "",
         draft_note=draft_note,
         sample_class=" portrait--sample" if sample else "",
-        photo_url=escape("./" + quote(photo_path.as_posix())),
+        photo_url=escape("./" + photo_url),
         photo_alt=escape(photo_alt),
         groom_name=groom,
         bride_name=bride,

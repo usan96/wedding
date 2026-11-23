@@ -23,12 +23,14 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.11'
+      - uses: actions/configure-pages@v5
+        id: pages
       - name: Prepare invitation files
         env:
           TMAP_PUBLIC_APP_KEY: ${{ vars.TMAP_PUBLIC_APP_KEY }}
           NAVER_MAP_CLIENT_ID: ${{ vars.NAVER_MAP_CLIENT_ID }}
+          WEDDING_SITE_URL: ${{ steps.pages.outputs.base_url }}
         run: python scripts/generate_invitation.py --publish-dir _site
-      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
           path: _site
