@@ -328,8 +328,9 @@ shareButton.addEventListener("click", async () => {
   link.hidden = true;
 
   if (navigator.share) {
+    const title = document.querySelector('meta[property="og:title"]')?.content || document.title;
     try {
-      await navigator.share({ title: document.title, url: url.href });
+      await navigator.share({ title, url: url.href });
       return;
     } catch (error) {
       if (error.name === "AbortError") return;

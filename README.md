@@ -5,6 +5,8 @@
 | 입력 항목 | 입력 예시 |
 | --- | --- |
 | `status` | 초안 검토 중에는 `"draft"` |
+| `share_title` | 링크 공유 미리보기와 브라우저 탭에 표시할 제목. 비워 두면 신랑·신부 이름으로 기본 제목을 만듭니다. |
+| `share_description` | 링크 공유 미리보기에서 제목 아래에 나오는 설명. 비워 두면 예식 일시와 장소를 표시합니다. |
 | `background_color` | 청첩장 본문의 배경색. `"#fdfdfd"`처럼 6자리 색상 코드를 입력합니다. |
 | `cover_title_font` | ‘Our Wedding Day’ 서체. `"blacksword"` 또는 `"qillsey-einstein"`을 입력합니다. 기본값은 `"qillsey-einstein"`입니다. [Blacksword 제작자 안내](https://www.dafont.com/blacksword.font) |
 | `cover_title_scale` | ‘Our Wedding Day’ 크기 배율. `1`이 기본 크기이며 `0.5`부터 `1.3`까지 입력할 수 있습니다. |

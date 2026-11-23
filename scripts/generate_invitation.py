@@ -32,7 +32,7 @@ PHOTO_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 DEFAULT_BACKGROUND_COLOR = "#fdfdfd"
 REQUIRED_TEXT_FIELDS = ("groom_name", "bride_name", "venue_name", "venue_address")
 OPTIONAL_TEXT_FIELDS = (
-    "venue_hall", "venue_floor", "cover_photo_alt",
+    "venue_hall", "venue_floor", "cover_photo_alt", "share_title", "share_description",
     "groom_father_name", "groom_mother_name", "bride_father_name", "bride_mother_name",
     "subway", "car", "bus", "parking", "shuttle", "groom_phone", "bride_phone",
 )
@@ -129,6 +129,8 @@ class Invitation:
     cover_title_font: str = DEFAULT_COVER_TITLE_FONT
     cover_title_scale: float = 1.0
     cover_title_bold: bool = False
+    share_title: str = ""
+    share_description: str = ""
 
 
 class JsonObject(dict):
@@ -796,10 +798,16 @@ def render(invitation, photo_path, gallery, map_path=None, shuttle_photo_path=No
     draft = invitation.status == "draft"
     sample = invitation.cover_photo == SAMPLE_PHOTO
     groom, bride = escape(invitation.groom_name), escape(invitation.bride_name)
-    title = f"{groom} · {bride} | 모바일 청첩장"
+    share_title = invitation.share_title.strip() or (
+        f"{invitation.groom_name} · {invitation.bride_name} | 모바일 청첩장"
+    )
+    schedule_date = f"{event_date.year}년 {event_date.month}월 {event_date.day}일 {weekday}요일"
+    share_description = invitation.share_description.strip() or (
+        f"{schedule_date} {display_time} · {invitation.venue_name}"
+    )
     draft_note = ""
     if draft:
-        title += " 초안"
+        share_title += " 초안"
         note = "청첩장 초안"
         example_info = all(
             getattr(invitation, field).strip() == EXAMPLE_TEXT[field] for field in REQUIRED_TEXT_FIELDS
@@ -817,7 +825,8 @@ def render(invitation, photo_path, gallery, map_path=None, shuttle_photo_path=No
     photo_alt = invitation.cover_photo_alt or ("예시 웨딩 사진" if sample else "웨딩 사진")
 
     values = dict(
-        page_title=title,
+        share_title=escape(share_title),
+        share_description=escape(share_description),
         background_color=escape(invitation.background_color),
         robots='  <meta name="robots" content="noindex">\n' if draft else "",
         leaflet_tags=LEAFLET_TAGS if invitation.directions else "",
@@ -833,7 +842,7 @@ def render(invitation, photo_path, gallery, map_path=None, shuttle_photo_path=No
         cover_title_class=" cover-title--bold" if invitation.cover_title_bold else "",
         cover_date=f"{event_date:%Y.%m.%d}.{'MON TUE WED THU FRI SAT SUN'.split()[event_date.weekday()]} "
                    f"{event_time.hour % 12 or 12:02d}:{event_time.minute:02d}{'AM' if period == '오전' else 'PM'}",
-        schedule_date=f"{event_date.year}년 {event_date.month}월 {event_date.day}일 {weekday}요일",
+        schedule_date=schedule_date,
         event_datetime=f"{event_date.isoformat()}T{event_time.isoformat(timespec='minutes')}",
         event_time=display_time,
         calendar_year=event_date.year,
