@@ -108,6 +108,14 @@ if (countdown) {
 
 const copyAddress = document.querySelector(".address-copy");
 
+function selectText(element) {
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  selection.removeAllRanges();
+  selection.addRange(range);
+}
+
 if (copyAddress) {
   const address = document.querySelector(".venue-address");
   const status = document.querySelector(".address-status");
@@ -117,12 +125,24 @@ if (copyAddress) {
       await navigator.clipboard.writeText(address.textContent.trim());
       status.textContent = "예식장 주소를 복사했어요.";
     } catch {
-      const selection = window.getSelection();
-      const range = document.createRange();
-      range.selectNodeContents(address);
-      selection.removeAllRanges();
-      selection.addRange(range);
+      selectText(address);
       status.textContent = "선택된 주소를 복사해 주세요.";
+    }
+  });
+}
+
+for (const button of document.querySelectorAll(".account-copy")) {
+  const card = button.closest(".contact-card");
+  const number = card.querySelector(".account-number");
+  const status = card.querySelector(".account-status");
+  button.hidden = false;
+  button.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(number.textContent.trim());
+      status.textContent = "계좌번호를 복사했어요.";
+    } catch {
+      selectText(number);
+      status.textContent = "선택된 계좌번호를 복사해 주세요.";
     }
   });
 }

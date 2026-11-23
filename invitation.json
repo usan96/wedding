@@ -5,19 +5,17 @@
   "cover_title_scale": 1.30,
   "cover_title_bold": false,
   "groom_name": "김병남",
-  "groom_phone": "010-2699-5627",
   "groom_account": {
     "bank": "토스뱅크",
-    "number": "1000-1144-8182",
+    "number": "100011448182",
     "holder": "김병남"
   },
   "groom_father_name": "김상범",
   "groom_mother_name": "양인자",
   "bride_name": "김민아",
-  "bride_phone": "010-7131-7754",
   "bride_account": {
-    "bank": "신한은행",
-    "number": "1000-1234-5678",
+    "bank": "카카오뱅크",
+    "number": "3333306035999",
     "holder": "김민아"
   },
   "bride_father_name": "김성기",

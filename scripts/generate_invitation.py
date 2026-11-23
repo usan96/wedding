@@ -734,16 +734,16 @@ def render_transport(invitation, shuttle_photo_path):
 def render_contacts(invitation):
     panels = []
     for field, account, label in (
-        ("groom_phone", invitation.groom_account, "신랑 측"),
-        ("bride_phone", invitation.bride_account, "신부 측"),
+        ("groom_phone", invitation.groom_account, "신랑"),
+        ("bride_phone", invitation.bride_account, "신부"),
     ):
         display_number = getattr(invitation, field).strip()
         if not display_number and account is None:
             continue
         panels.append(
-            '        <details class="contact-details">\n'
-            f'          <summary>{label}</summary>\n'
-            '          <div class="contact-card">\n'
+            '        <details class="contact-card">\n'
+            f'          <summary>{label} 측</summary>\n'
+            '          <div class="contact-content">\n'
         )
         if display_number:
             dial_number = re.sub(r"[ ().-]", "", display_number)
@@ -755,8 +755,13 @@ def render_contacts(invitation):
             )
         if account is not None:
             panels.append(
-                f'            <p class="contact-account">{escape(account.bank)} {escape(account.number)}'
-                f'<br><span>예금주 {escape(account.holder)}</span></p>\n'
+                f'            <p class="account-holder"><span>{label}</span> {escape(account.holder)}</p>\n'
+                '            <div class="account-row">\n'
+                f'              <p>{escape(account.bank)} <span class="account-number">{escape(account.number)}</span></p>\n'
+                f'              <button type="button" class="account-copy" aria-label="{label} 측 계좌번호 복사" hidden>'
+                '<span class="account-copy-icon" aria-hidden="true"></span></button>\n'
+                '            </div>\n'
+                '            <p class="account-status" role="status"></p>\n'
             )
         panels.append('          </div>\n        </details>\n')
     if not panels:
@@ -769,15 +774,13 @@ def render_contacts(invitation):
         )
     return (
         '    <section class="section contacts" aria-labelledby="contacts-title">\n'
-        '      <details class="contact-disclosure">\n'
-        '        <summary id="contacts-title" class="contact-heading">마음 전하실 곳</summary>\n'
-        '        <div class="contact-panels">\n'
-        + "".join(panels)
-        + '        </div>\n'
-        '      </details>\n'
+        '      <h2 id="contacts-title">마음 전하실 곳</h2>\n'
         + account_message
         + '      <p class="contacts-message">소중한 축하를 보내주셔서 감사드리며,<br>'
         '따뜻한 마음에 깊이 감사드립니다.</p>\n'
+        '      <div class="contact-panels">\n'
+        + "".join(panels)
+        + '      </div>\n'
         '    </section>\n\n'
     )
 

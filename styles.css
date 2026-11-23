@@ -145,8 +145,7 @@ button, summary { cursor: pointer; }
 
 .section { padding-inline: var(--gutter); }
 
-.section h2,
-.contact-heading {
+.section h2 {
   color: var(--red);
   font-size: 1.375rem;
   font-weight: 400;
@@ -509,17 +508,13 @@ button, summary { cursor: pointer; }
   text-align: start;
 }
 
-.transport-details, .contact-details {
-  border-radius: 5px;
-}
-
-.contact-details { border: 1px solid var(--line); }
+.transport-details { border-radius: 5px; }
 
 .directions-actions, .transport-details {
   border: 1px solid #91848a;
 }
 
-.transport-details summary, .contact-details summary {
+.transport-details summary, .contact-card > summary {
   display: flex;
   min-height: 58px;
   align-items: center;
@@ -531,8 +526,7 @@ button, summary { cursor: pointer; }
 summary { list-style: none; }
 summary::-webkit-details-marker { display: none; }
 
-.transport-details > summary::after,
-.contact-details > summary::after {
+:is(.transport-details, .contact-card) > summary::after {
   flex: 0 0 11px;
   height: 11px;
   margin-right: 1px;
@@ -542,11 +536,11 @@ summary::-webkit-details-marker { display: none; }
   transform: translateY(-3px) rotate(45deg);
 }
 
-:is(.transport-details, .contact-details)[open] > summary::after {
+:is(.transport-details, .contact-card)[open] > summary::after {
   transform: translateY(3px) rotate(225deg);
 }
 
-.transport-description, .contact-card {
+.transport-description {
   padding: 0 16px 15px;
   white-space: pre-line;
 }
@@ -562,18 +556,81 @@ summary::-webkit-details-marker { display: none; }
 .shuttle-photo img { width: 100%; height: auto; border-radius: 4px; }
 
 .contacts { padding-top: 125px; }
-.contact-heading {
-  width: max-content;
-  max-width: 100%;
-  min-height: 44px;
-  margin-inline: auto;
-  padding: 5px 6px;
+.contact-panels { margin-top: 24px; }
+.contact-card {
+  border: 1px solid var(--line);
+  border-radius: 5px;
 }
 
-.contact-heading:hover { text-decoration: underline; text-underline-offset: 0.25em; }
-.contact-panels { margin: 12px auto 0; }
-.contact-card { white-space: normal; }
+.contact-card > summary { min-height: 46px; padding-block: 10px; }
+.contact-content { padding: 0 16px 15px; }
+
 .contact-link { display: inline-block; padding-block: 9px; }
+.account-holder {
+  margin-bottom: 9px;
+  font-size: 1.0625rem;
+}
+
+.account-holder span {
+  margin-right: 5px;
+  color: var(--muted);
+  font-size: 0.9375rem;
+}
+
+.account-row {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 12px;
+  overflow-wrap: anywhere;
+  border-radius: 5px;
+  background: #f2dada;
+  font-variant-numeric: tabular-nums;
+}
+
+.account-row p { padding-block: 8px; }
+.account-copy {
+  display: grid;
+  flex: 0 0 44px;
+  min-height: 44px;
+  place-items: center;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: #775e65;
+}
+
+.account-copy:is(:hover, :focus-visible) { background: #ebcacc; }
+.account-copy-icon {
+  position: relative;
+  width: 17px;
+  height: 20px;
+}
+
+.account-copy-icon::before,
+.account-copy-icon::after {
+  position: absolute;
+  width: 11px;
+  height: 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
+  content: "";
+}
+
+.account-copy-icon::before { inset: 0 auto auto 0; }
+.account-copy-icon::after {
+  inset: auto 0 0 auto;
+  background: #f2dada;
+}
+
+.account-copy:is(:hover, :focus-visible) .account-copy-icon::after { background: #ebcacc; }
+.account-status:not(:empty) {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
 .contacts-message {
   margin-top: 26px;
   font-size: 0.9375rem;
