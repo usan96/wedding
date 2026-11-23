@@ -29,7 +29,7 @@ SAMPLE_PHOTO = ROOT / "sample.png"
 ASSETS_DIR = ROOT / "assets"
 GALLERY_DIR = ASSETS_DIR / "gallery"
 PHOTO_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
-DEFAULT_BACKGROUND_COLOR = "#f8f6f0"
+DEFAULT_BACKGROUND_COLOR = "#fdfdfd"
 REQUIRED_TEXT_FIELDS = ("groom_name", "bride_name", "venue_name", "venue_address")
 OPTIONAL_TEXT_FIELDS = (
     "venue_hall", "venue_floor", "cover_photo_alt",
@@ -47,13 +47,18 @@ EXAMPLE_TEXT = {
 INPUT_FIELDS = {
     *REQUIRED_TEXT_FIELDS, *OPTIONAL_TEXT_FIELDS,
     "status", "date", "time", "directions", "directions_url", "cover_photo", "gallery_photos",
-    "background_color", "groom_account", "bride_account", "shuttle_photo",
+    "background_color", "groom_account", "bride_account", "shuttle_photo", "gallery_order",
 }
 ACCOUNT_FIELDS = ("bank", "number", "holder")
 DIRECTIONS_FIELDS = {"latitude", "longitude", "map_image", "naver_place_url", "tmap_place_url"}
 NAVER_PLACE_HOSTS = {"map.naver.com", "m.map.naver.com", "m.place.naver.com", "naver.me"}
 TMAP_PLACE_HOSTS = {"tmap.life", "poi.tmobiweb.com"}
 LEAFLET_ASSETS = Path("vendor/leaflet")
+FONT_ASSETS = Path("assets/fonts")
+INVITATION_FONTS = (
+    "gowun-dodum.woff2", "gowun-dodum-OFL.txt",
+    "satisfy.woff2", "satisfy-LICENSE.txt",
+)
 LEAFLET_TAGS = (
     '  <link rel="stylesheet" href="./vendor/leaflet/leaflet.css">\n'
     '  <script src="./vendor/leaflet/leaflet.js" defer></script>\n'
@@ -446,6 +451,15 @@ def load_gallery_photos(values, status):
         ),
         key=lambda path: (path.name.casefold(), path.relative_to(GALLERY_DIR).as_posix()),
     )
+    if "gallery_order" in values:
+        order = values["gallery_order"]
+        available = {path.relative_to(ROOT).as_posix(): path for path in paths}
+        if not isinstance(order, list) or not all(isinstance(path, str) and path in available for path in order):
+            raise InputError("gallery_order — assets/gallery/에 있는 사진 경로를 배열로 입력해 주세요.")
+        if len(order) != len(set(order)):
+            raise InputError("gallery_order — 같은 사진 경로가 중복되어 있습니다.")
+        paths = [available[path] for path in order]
+
     photos = []
     for path in paths:
         relative = path.relative_to(ROOT).as_posix()
@@ -530,7 +544,8 @@ def calendar_rows(event_date):
                 )
             else:
                 label = str(day) if day else ""
-            cells.append(f"<td>{label}</td>")
+            holiday = ' class="calendar-holiday"' if day == 1 and event_date.month == 3 else ""
+            cells.append(f"<td{holiday}>{label}</td>")
         rows.append("            <tr>" + "".join(cells) + "</tr>\n")
     return "".join(rows)
 
@@ -540,24 +555,28 @@ def render_gallery(gallery):
         return ""
 
     images = []
+    first_url = escape("./" + quote(gallery[0][1].as_posix()))
     for number, (photo, output_path) in enumerate(gallery, start=1):
         url = escape("./" + quote(output_path.as_posix()))
         alt = escape(photo.alt or f"웨딩 사진 {number}")
+        span = " gallery-photo--wide" if number in (4, 5, 12, 13) else ""
         images.append(
-            f'        <a class="gallery-photo" href="{url}">\n'
+            f'        <a class="gallery-photo{span}" href="{url}">\n'
             f'          <img src="{url}" alt="{alt}" loading="lazy">\n'
             '        </a>\n'
         )
     return (
-        '    <section class="section gallery" aria-label="웨딩 사진">\n'
+        '    <section class="section gallery" aria-labelledby="gallery-title">\n'
+        '      <h2 id="gallery-title" lang="en">Gallery</h2>\n'
         '      <div class="gallery-photos">\n'
         + "".join(images)
         + '      </div>\n'
+        '      <p class="gallery-hint">클릭하면 이미지를 크게 보실 수 있습니다.</p>\n'
         '      <dialog class="gallery-dialog" aria-label="웨딩 사진 크게 보기">\n'
         '        <div class="gallery-dialog-content">\n'
         '          <button class="gallery-close" type="button" aria-label="사진 닫기" autofocus></button>\n'
         '          <div class="gallery-stage">\n'
-        '            <img class="gallery-full-photo" alt="" hidden>\n'
+        f'            <img class="gallery-full-photo" src="{first_url}" alt="" hidden>\n'
         '            <p class="gallery-message" role="status"></p>\n'
         '          </div>\n'
         '          <div class="gallery-controls">\n'
@@ -573,7 +592,16 @@ def render_gallery(gallery):
 
 def render_directions(invitation, map_path):
     directions = invitation.directions
-    address = f'<p class="venue-address">{escape(invitation.venue_address)}</p>\n'
+    address = (
+        '      <div class="address-line">\n'
+        f'        <p class="venue-address">{escape(invitation.venue_address)}</p>\n'
+        '        <button type="button" class="address-copy" aria-label="예식장 주소 복사" hidden>'
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true">'
+        '<rect x="8" y="7" width="11" height="14" rx="2"/><path d="M6 17H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/>'
+        '</svg></button>\n'
+        '        <p class="address-status" role="status"></p>\n'
+        '      </div>\n'
+    )
     if directions is None:
         return (
             f'      {address}'
@@ -590,6 +618,7 @@ def render_directions(invitation, map_path):
     naver_url = escape(directions.naver_place_url)
     kakao_name = quote(invitation.venue_name, safe="")
     kakao_url = f"https://map.kakao.com/link/to/{kakao_name},{directions.latitude},{directions.longitude}"
+    kakao_map = f"https://map.kakao.com/link/map/{kakao_name},{directions.latitude},{directions.longitude}"
     tmap_url = escape(directions.tmap_place_url) or "#tmap-help"
     tmap_route = directions.tmap_route_url
     tmap_action = f' data-tmap-route="{escape(tmap_route)}"' if tmap_route else ""
@@ -600,38 +629,38 @@ def render_directions(invitation, map_path):
             'T맵을 열 수 없으면 위 주소를 복사하거나 다른 지도를 선택해 주세요.</p>\n'
         )
     return (
-        '      <section class="directions" aria-labelledby="directions-title">\n'
-        '        <h2 id="directions-title">오시는 길</h2>\n'
         f'        {address}'
         '        <figure class="venue-map">\n'
         '          <div class="venue-map-frame">\n'
-        f'            <img class="venue-map-image" src="{map_url}" alt="{venue} 위치와 주변 도로" decoding="async">\n'
+        f'            <a class="venue-map-preview" href="{kakao_map}">\n'
+        f'              <img class="venue-map-image" src="{map_url}" alt="{venue} 위치와 주변 도로">\n'
+        '              <span class="venue-map-hint">지도에서 위치 보기</span>\n'
+        '            </a>\n'
         '            <div class="venue-map-interactive" inert role="region"\n'
         f'              aria-label="{venue} 지도" data-venue="{venue}"\n'
         f'              data-latitude="{directions.latitude}" data-longitude="{directions.longitude}"'
         f'{naver_map_attribute}></div>\n'
+        '            <span class="venue-map-hint venue-map-gesture" aria-hidden="true">지도를 눌러 움직일 수 있어요</span>\n'
         '          </div>\n'
-        '          <p class="venue-map-hint">한 손가락으로 지도를 움직이고, 두 손가락으로 확대·축소할 수 있어요.</p>\n'
         '          <figcaption><a href="https://www.openstreetmap.org/copyright">'
         '© OpenStreetMap contributors</a></figcaption>\n'
         '        </figure>\n'
         '        <div class="directions-actions">\n'
-        f'          <a class="directions-link" href="{naver_url}" data-naver-query="{naver_query}">네이버 지도</a>\n'
+        f'          <a class="directions-link" href="{naver_url}" data-naver-query="{naver_query}">네이버지도</a>\n'
+        f'          <a class="directions-link" href="{tmap_url}"{tmap_action}>T MAP</a>\n'
         f'          <a class="directions-link" href="{kakao_url}">카카오맵</a>\n'
-        f'          <a class="directions-link" href="{tmap_url}"{tmap_action}>T맵</a>\n'
         '        </div>\n'
         f'{tmap_help}'
-        '      </section>\n'
     )
 
 
 def render_parents(invitation):
     lines = []
     for father, mother, relationship, name in (
-        (invitation.groom_father_name, invitation.groom_mother_name, "아들", invitation.groom_name),
-        (invitation.bride_father_name, invitation.bride_mother_name, "딸", invitation.bride_name),
+        (invitation.groom_father_name, invitation.groom_mother_name, "장남", invitation.groom_name),
+        (invitation.bride_father_name, invitation.bride_mother_name, "장녀", invitation.bride_name),
     ):
-        parents = " · ".join(escape(parent.strip()) for parent in (father, mother) if parent.strip())
+        parents = "·".join(escape(parent.strip()) for parent in (father, mother) if parent.strip())
         if parents:
             lines.append(f"        <p>{parents}의 {relationship} <strong>{escape(name)}</strong></p>\n")
     if not lines:
@@ -641,15 +670,21 @@ def render_parents(invitation):
 
 def render_transport(invitation, shuttle_photo_path):
     entries = []
+    if invitation.directions is not None:
+        transit = escape(invitation.directions.naver_place_url)
+        for label, service in (("지하철 이용 시", "지하철"), ("자차 이용 시", "자동차"), ("버스 이용 시", "버스")):
+            entries.append(
+                '        <details class="transport-details">\n'
+                f'          <summary>{label}</summary>\n'
+                f'          <p class="transport-description"><a href="{transit}">네이버지도에서 {service} 길찾기</a></p>\n'
+                '        </details>\n'
+            )
     parking = escape(invitation.parking.strip())
-    if parking:
-        entries.append(f'        <div><dt>주차</dt><dd class="transport-description">{parking}</dd></div>\n')
-
     shuttle = escape(invitation.shuttle.strip())
     if shuttle or shuttle_photo_path is not None:
-        entries.append('        <div><dt>셔틀</dt><dd>')
+        entries.append('        <details class="transport-details"><summary>셔틀버스</summary>\n')
         if shuttle:
-            entries.append(f'<span class="transport-description">{shuttle}</span>')
+            entries.append(f'          <p class="transport-description">{shuttle}</p>\n')
         if shuttle_photo_path is not None:
             photo_url = escape("./" + quote(shuttle_photo_path.as_posix()))
             entries.append(
@@ -658,10 +693,16 @@ def render_transport(invitation, shuttle_photo_path):
                 f'            <img src="{photo_url}" alt="셔틀 탑승 장소" loading="lazy" decoding="async">\n'
                 '          </details>\n        '
             )
-        entries.append('</dd></div>\n')
+        entries.append('        </details>\n')
+    if parking:
+        entries.append(
+            '        <details class="transport-details"><summary>주차 안내</summary>\n'
+            f'          <p class="transport-description">{parking}</p>\n'
+            '        </details>\n'
+        )
     if not entries:
         return ""
-    return '      <dl class="transport">\n' + "".join(entries) + '      </dl>\n'
+    return '      <div class="transport">\n' + "".join(entries) + '      </div>\n'
 
 
 def render_contacts(invitation):
@@ -694,13 +735,23 @@ def render_contacts(invitation):
         panels.append('          </div>\n        </details>\n')
     if not panels:
         return ""
+    account_message = ""
+    if invitation.groom_account or invitation.bride_account:
+        account_message = (
+            '      <p class="contacts-message">멀리서도 축하의 마음을<br>전하고 싶으신 분들을 위해<br>'
+            '계좌번호를 안내드립니다.</p>\n'
+        )
     return (
         '    <section class="section contacts" aria-labelledby="contacts-title">\n'
-        '      <h2 id="contacts-title">마음 전하실 곳</h2>\n'
-        '      <p class="contacts-message">따뜻한 마음으로 저희의 시작을 응원해 주셔서 감사합니다.</p>\n'
-        '      <div class="contact-panels">\n'
+        '      <details class="contact-disclosure">\n'
+        '        <summary id="contacts-title" class="contact-heading">마음 전하실 곳</summary>\n'
+        '        <div class="contact-panels">\n'
         + "".join(panels)
-        + '      </div>\n'
+        + '        </div>\n'
+        '      </details>\n'
+        + account_message
+        + '      <p class="contacts-message">소중한 축하를 보내주셔서 감사드리며,<br>'
+        '따뜻한 마음에 깊이 감사드립니다.</p>\n'
         '    </section>\n\n'
     )
 
@@ -744,20 +795,20 @@ def render(invitation, photo_path, gallery, map_path=None, shuttle_photo_path=No
         draft_attribute=" data-draft" if draft else "",
         draft_note=draft_note,
         sample_class=" portrait--sample" if sample else "",
-        sample_dimensions=' width="2430" height="3293"' if sample else "",
         photo_url=escape("./" + quote(photo_path.as_posix())),
         photo_alt=escape(photo_alt),
         groom_name=groom,
         bride_name=bride,
-        cover_date=f"{event_date.isoformat().replace('-', '.')} {weekday}요일",
-        schedule_date=f"{event_date.year}. {event_date.month}. {event_date.day}. ({weekday})",
+        cover_date=f"{event_date:%Y.%m.%d}.{'MON TUE WED THU FRI SAT SUN'.split()[event_date.weekday()]} "
+                   f"{event_time.hour % 12 or 12:02d}:{event_time.minute:02d}{'AM' if period == '오전' else 'PM'}",
+        schedule_date=f"{event_date.year}년 {event_date.month}월 {event_date.day}일 {weekday}요일",
         event_datetime=f"{event_date.isoformat()}T{event_time.isoformat(timespec='minutes')}",
         event_time=display_time,
-        calendar_month=f"{event_date.year}년 {event_date.month}월",
+        calendar_year=event_date.year,
+        calendar_month=f"{event_date.month}월",
         calendar_rows=calendar_rows(event_date),
         gallery=render_gallery(gallery),
         parents=render_parents(invitation),
-        venue_name=escape(invitation.venue_name),
         venue_summary=escape(venue_summary),
         directions_section=render_directions(invitation, map_path),
         transport=render_transport(invitation, shuttle_photo_path),
@@ -811,6 +862,9 @@ def write_publish_bundle(invitation, output):
         (bundle / "index.html").write_text(page, encoding="utf-8")
         for asset in ("styles.css", "invitation.js"):
             shutil.copyfile(ROOT / asset, bundle / asset)
+        (bundle / FONT_ASSETS).mkdir()
+        for font in INVITATION_FONTS:
+            shutil.copyfile(ROOT / FONT_ASSETS / font, bundle / FONT_ASSETS / font)
         shutil.copytree(ROOT / LEAFLET_ASSETS, bundle / LEAFLET_ASSETS)
         shutil.copyfile(invitation.cover_photo, bundle / photo_path)
         shutil.copyfile(directions.map_image, bundle / map_path)

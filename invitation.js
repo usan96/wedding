@@ -7,7 +7,6 @@ if (typeof galleryDialog?.showModal === "function") {
   const message = galleryDialog.querySelector(".gallery-message");
   const position = galleryDialog.querySelector(".gallery-position");
   const controls = galleryDialog.querySelector(".gallery-controls");
-  const previewLimit = 5;
   let currentPhoto = 0;
   let opener;
 
@@ -46,22 +45,6 @@ if (typeof galleryDialog?.showModal === "function") {
     });
   }
 
-  if (photos.length > previewLimit) {
-    for (const photo of photos.slice(previewLimit)) photo.hidden = true;
-
-    const lastPreview = photos[previewLimit - 1];
-    const remaining = photos.length - previewLimit;
-    const count = document.createElement("span");
-    count.className = "gallery-more";
-    count.textContent = `+${remaining}`;
-    count.setAttribute("aria-hidden", "true");
-    lastPreview.append(count);
-    lastPreview.setAttribute(
-      "aria-label",
-      `${lastPreview.querySelector("img").alt} 크게 보기, 이후 사진 ${remaining}장`,
-    );
-  }
-
   controls.hidden = photos.length === 1;
   for (const button of controls.querySelectorAll("button")) {
     button.addEventListener("click", () => showPhoto(currentPhoto + Number(button.dataset.galleryStep)));
@@ -79,16 +62,83 @@ if (typeof galleryDialog?.showModal === "function") {
   });
 }
 
+const countdown = document.querySelector(".countdown");
+
+if (countdown) {
+  const eventTime = Date.parse(`${countdown.dataset.event}+09:00`);
+  const dayMs = 86400000;
+  const koreaOffsetMs = 9 * 60 * 60 * 1000;
+  const status = document.querySelector(".wedding-status");
+  const statusText = status.querySelector(".wedding-status-text");
+  const daysLabel = document.createElement("strong");
+  const parts = [...countdown.querySelectorAll("dd")];
+  let previousDays;
+
+  function updateCountdown() {
+    const now = Date.now();
+    const seconds = Math.max(0, Math.floor((eventTime - now) / 1000));
+    const values = [
+      Math.floor(seconds / 86400),
+      Math.floor(seconds / 3600) % 24,
+      Math.floor(seconds / 60) % 60,
+      seconds % 60,
+    ];
+    parts.forEach((part, index) => {
+      part.textContent = String(values[index]).padStart(2, "0");
+    });
+
+    const days = Math.floor((eventTime + koreaOffsetMs) / dayMs) - Math.floor((now + koreaOffsetMs) / dayMs);
+    if (days === previousDays) return;
+    previousDays = days;
+    if (days > 0) {
+      daysLabel.textContent = `${days}일`;
+      statusText.replaceChildren("의 결혼식이 ", daysLabel, " 남았습니다.");
+    } else {
+      statusText.textContent = days === 0 ? "의 결혼식은 오늘입니다." : "의 결혼식이 열렸습니다.";
+    }
+  }
+
+  if (Number.isFinite(eventTime)) {
+    updateCountdown();
+    countdown.hidden = false;
+    status.hidden = false;
+    window.setInterval(updateCountdown, 1000);
+  }
+}
+
+const copyAddress = document.querySelector(".address-copy");
+
+if (copyAddress) {
+  const address = document.querySelector(".venue-address");
+  const status = document.querySelector(".address-status");
+  copyAddress.hidden = false;
+  copyAddress.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(address.textContent.trim());
+      status.textContent = "예식장 주소를 복사했어요.";
+    } catch {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(address);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      status.textContent = "선택된 주소를 복사해 주세요.";
+    }
+  });
+}
+
 const venueMap = document.querySelector(".venue-map-interactive");
 
 if (venueMap && /^https?:$/.test(location.protocol)) {
   const { latitude, longitude, venue, naverClientId } = venueMap.dataset;
   const center = [Number(latitude), Number(longitude)];
   const figure = venueMap.closest(".venue-map");
+  const preview = figure.querySelector(".venue-map-preview");
 
   function showVenueMap(provider) {
     figure.classList.add("is-interactive");
     figure.dataset.mapProvider = provider;
+    preview.hidden = true;
     venueMap.removeAttribute("inert");
   }
 
@@ -141,6 +191,7 @@ if (venueMap && /^https?:$/.test(location.protocol)) {
         window.removeEventListener("resize", resizeMap);
         figure.classList.remove("is-interactive");
         delete figure.dataset.mapProvider;
+        preview.hidden = false;
         venueMap.setAttribute("inert", "");
         map?.destroy();
         container.remove();

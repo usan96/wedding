@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ko" style="--paper: #f8f6f0">
+<html lang="ko" style="--paper: #fdfdfd">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f8f6f0">
+  <meta name="theme-color" content="#fdfdfd">
   <title>김병남 · 김민아 | 모바일 청첩장</title>
   <link rel="stylesheet" href="./vendor/leaflet/leaflet.css">
   <script src="./vendor/leaflet/leaflet.js" defer></script>
@@ -13,85 +13,119 @@
 <body>
   <main class="invitation">
     <header class="cover">
-      <figure class="portrait">
-        <div class="portrait-window">
-          <img src="./assets/gallery/HE_01466-1.jpg" alt="커버 사진">
-        </div>
-      </figure>
-
+      <div class="portrait">
+        <img src="./assets/cover.webp" alt="베일 아래에서 바라보며 웃는 신랑과 신부" fetchpriority="high">
+      </div>
       <div class="cover-details">
-        <h1 class="cover-names"><span>김병남</span> <span>김민아</span></h1>
-        <div class="cover-copy">
-          <p class="cover-message">아름다운 날,<br>첫 시작을 축복해 주세요</p>
-          <p class="cover-date"><time datetime="2027-03-27T14:30">2027.03.27 토요일<br>오후 2시 30분</time></p>
-          <p class="cover-venue">더블유스퀘어컨벤션</p>
-        </div>
+        <h1 class="cover-title"><span class="visually-hidden">김병남 · 김민아 </span><span lang="en">Our<br>Wedding Day</span></h1>
+        <p class="cover-date"><time datetime="2027-03-27T14:30">2027.03.27.SAT 02:30PM</time></p>
       </div>
     </header>
 
-    <section class="section greeting" aria-label="초대 인사">
-      <div class="greeting-message">
-        <p>서로의 일상에 가장 다정한 사람이 되어<br>
-          이제 같은 길을 걸으려 합니다.</p>
-        <p>저희의 첫걸음을 함께 축복해 주시면<br>
-          더없이 기쁘겠습니다.</p>
-      </div>
+    <section class="section greeting" aria-labelledby="greeting-title">
+      <h2 id="greeting-title" lang="en">Invitation</h2>
       <div class="family">
-        <p>김상범 · 양인자의 아들 <strong>김병남</strong></p>
-        <p>김성기 · 이수경의 딸 <strong>김민아</strong></p>
+        <p>김상범·양인자의 장남 <strong>김병남</strong></p>
+        <p>김성기·이수경의 장녀 <strong>김민아</strong></p>
       </div>
+      <p class="greeting-message">사랑으로 채운 9년의 시간 동안<br>
+        서로에게 가장 소중한 사람이 되었습니다.<br>
+        싱그러운 봄기운이 가득한 날,<br>
+        부부의 연을 맺고자 합니다.<br>
+        저희 두 사람이 만들어갈<br>
+        새로운 이야기의 시작에<br>
+        소중한 분들을 초대합니다.</p>
     </section>
 
-    <section class="section gallery" aria-label="웨딩 사진">
+    <section class="section schedule" aria-labelledby="schedule-title">
+      <h2 id="schedule-title" lang="en">Date</h2>
+      <p class="event-date"><time datetime="2027-03-27T14:30">2027년 3월 27일 토요일 오후 2시 30분</time></p>
+      <div class="calendar-card">
+        <table class="calendar">
+          <caption><span class="visually-hidden">2027년 </span>3월</caption>
+          <thead>
+            <tr>
+              <th scope="col">일</th><th scope="col">월</th><th scope="col">화</th><th scope="col">수</th>
+              <th scope="col">목</th><th scope="col">금</th><th scope="col">토</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td></td><td class="calendar-holiday">1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
+            <tr><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
+            <tr><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td></tr>
+            <tr><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td><span class="wedding-day">27</span><span class="visually-hidden"> 예식일</span></td></tr>
+            <tr><td>28</td><td>29</td><td>30</td><td>31</td><td></td><td></td><td></td></tr>
+          </tbody>
+        </table>
+
+        <dl class="countdown" data-event="2027-03-27T14:30" hidden>
+          <div><dt lang="en">Day</dt><dd data-unit="days"></dd></div>
+          <div><dt lang="en">Hour</dt><dd data-unit="hours"></dd></div>
+          <div><dt lang="en">Min</dt><dd data-unit="minutes"></dd></div>
+          <div><dt lang="en">Sec</dt><dd data-unit="seconds"></dd></div>
+        </dl>
+      </div>
+      <p class="wedding-status" hidden>김병남 <svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21 3.8 13a5.4 5.4 0 0 1 7.6-7.7l.6.7.6-.7a5.4 5.4 0 0 1 7.6 7.7Z"/></svg> 김민아<span class="wedding-status-text"></span></p>
+    </section>
+
+    <section class="section gallery" aria-labelledby="gallery-title">
+      <h2 id="gallery-title" lang="en">Gallery</h2>
       <div class="gallery-photos">
-        <a class="gallery-photo" href="./assets/gallery/HE_00283-1.jpg">
-          <img src="./assets/gallery/HE_00283-1.jpg" alt="웨딩 사진 1" loading="lazy">
+        <a class="gallery-photo" href="./assets/gallery/01.webp">
+          <img src="./assets/gallery/01.webp" alt="웨딩 사진 1" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_00383-1.jpg">
-          <img src="./assets/gallery/HE_00383-1.jpg" alt="웨딩 사진 2" loading="lazy">
+        <a class="gallery-photo" href="./assets/gallery/02.webp">
+          <img src="./assets/gallery/02.webp" alt="웨딩 사진 2" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_00519-1.jpg">
-          <img src="./assets/gallery/HE_00519-1.jpg" alt="웨딩 사진 3" loading="lazy">
+        <a class="gallery-photo" href="./assets/gallery/03.webp">
+          <img src="./assets/gallery/03.webp" alt="웨딩 사진 3" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_00857-1.jpg">
-          <img src="./assets/gallery/HE_00857-1.jpg" alt="웨딩 사진 4" loading="lazy">
+        <a class="gallery-photo gallery-photo--wide" href="./assets/gallery/04.webp">
+          <img src="./assets/gallery/04.webp" alt="웨딩 사진 4" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_01054-1.jpg">
-          <img src="./assets/gallery/HE_01054-1.jpg" alt="웨딩 사진 5" loading="lazy">
+        <a class="gallery-photo gallery-photo--wide" href="./assets/gallery/05.webp">
+          <img src="./assets/gallery/05.webp" alt="웨딩 사진 5" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_01229-1.jpg">
-          <img src="./assets/gallery/HE_01229-1.jpg" alt="웨딩 사진 6" loading="lazy">
+        <a class="gallery-photo" href="./assets/gallery/06.webp">
+          <img src="./assets/gallery/06.webp" alt="웨딩 사진 6" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_01257-1.jpg">
-          <img src="./assets/gallery/HE_01257-1.jpg" alt="웨딩 사진 7" loading="lazy">
+        <a class="gallery-photo" href="./assets/gallery/07.webp">
+          <img src="./assets/gallery/07.webp" alt="웨딩 사진 7" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_01287-1.jpg">
-          <img src="./assets/gallery/HE_01287-1.jpg" alt="웨딩 사진 8" loading="lazy">
+        <a class="gallery-photo" href="./assets/gallery/08.webp">
+          <img src="./assets/gallery/08.webp" alt="웨딩 사진 8" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_01466-1.jpg">
-          <img src="./assets/gallery/HE_01466-1.jpg" alt="웨딩 사진 9" loading="lazy">
+        <a class="gallery-photo" href="./assets/gallery/09.webp">
+          <img src="./assets/gallery/09.webp" alt="웨딩 사진 9" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_08599-1.jpg">
-          <img src="./assets/gallery/HE_08599-1.jpg" alt="웨딩 사진 10" loading="lazy">
+        <a class="gallery-photo" href="./assets/gallery/10.webp">
+          <img src="./assets/gallery/10.webp" alt="웨딩 사진 10" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_08796-1.jpg">
-          <img src="./assets/gallery/HE_08796-1.jpg" alt="웨딩 사진 11" loading="lazy">
+        <a class="gallery-photo" href="./assets/gallery/11.webp">
+          <img src="./assets/gallery/11.webp" alt="웨딩 사진 11" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_09540-1.jpg">
-          <img src="./assets/gallery/HE_09540-1.jpg" alt="웨딩 사진 12" loading="lazy">
+        <a class="gallery-photo gallery-photo--wide" href="./assets/gallery/12.webp">
+          <img src="./assets/gallery/12.webp" alt="웨딩 사진 12" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_09616-1.jpg">
-          <img src="./assets/gallery/HE_09616-1.jpg" alt="웨딩 사진 13" loading="lazy">
+        <a class="gallery-photo gallery-photo--wide" href="./assets/gallery/13.webp">
+          <img src="./assets/gallery/13.webp" alt="웨딩 사진 13" loading="lazy">
         </a>
-        <a class="gallery-photo" href="./assets/gallery/HE_09814-1.jpg">
-          <img src="./assets/gallery/HE_09814-1.jpg" alt="웨딩 사진 14" loading="lazy">
+        <a class="gallery-photo" href="./assets/gallery/14.webp">
+          <img src="./assets/gallery/14.webp" alt="웨딩 사진 14" loading="lazy">
+        </a>
+        <a class="gallery-photo" href="./assets/gallery/15.webp">
+          <img src="./assets/gallery/15.webp" alt="웨딩 사진 15" loading="lazy">
+        </a>
+        <a class="gallery-photo" href="./assets/gallery/16.webp">
+          <img src="./assets/gallery/16.webp" alt="웨딩 사진 16" loading="lazy">
         </a>
       </div>
+      <p class="gallery-hint">클릭하면 이미지를 크게 보실 수 있습니다.</p>
       <dialog class="gallery-dialog" aria-label="웨딩 사진 크게 보기">
         <div class="gallery-dialog-content">
           <button class="gallery-close" type="button" aria-label="사진 닫기" autofocus></button>
           <div class="gallery-stage">
-            <img class="gallery-full-photo" alt="" hidden>
+            <img class="gallery-full-photo" src="./assets/gallery/01.webp" alt="" hidden>
             <p class="gallery-message" role="status"></p>
           </div>
           <div class="gallery-controls">
@@ -103,69 +137,65 @@
       </dialog>
     </section>
 
-    <section class="section schedule" aria-label="예식 일정">
-      <p class="event-date"><time datetime="2027-03-27T14:30">2027. 3. 27. (토) 오후 2시 30분</time></p>
-      <p class="event-venue">더블유스퀘어컨벤션 L층 그레이스 홀</p>
-      <div class="calendar-card">
-        <table class="calendar">
-          <caption>2027년 3월</caption>
-          <thead>
-            <tr>
-              <th scope="col">일</th><th scope="col">월</th><th scope="col">화</th><th scope="col">수</th>
-              <th scope="col">목</th><th scope="col">금</th><th scope="col">토</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td></td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td></tr>
-            <tr><td>7</td><td>8</td><td>9</td><td>10</td><td>11</td><td>12</td><td>13</td></tr>
-            <tr><td>14</td><td>15</td><td>16</td><td>17</td><td>18</td><td>19</td><td>20</td></tr>
-            <tr><td>21</td><td>22</td><td>23</td><td>24</td><td>25</td><td>26</td><td><span class="wedding-day">27</span><span class="visually-hidden"> 예식일</span></td></tr>
-            <tr><td>28</td><td>29</td><td>30</td><td>31</td><td></td><td></td><td></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <section class="directions" aria-labelledby="directions-title">
-        <h2 id="directions-title">오시는 길</h2>
+    <section class="section location" aria-labelledby="location-title">
+      <h2 id="location-title" lang="en">Location</h2>
+      <p class="event-venue">W스퀘어컨벤션 L층 그레이스홀</p>
+              <div class="address-line">
         <p class="venue-address">경기도 성남시 분당구 판교역로226번길 16</p>
+        <button type="button" class="address-copy" aria-label="예식장 주소 복사" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" aria-hidden="true"><rect x="8" y="7" width="11" height="14" rx="2"/><path d="M6 17H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2"/></svg></button>
+        <p class="address-status" role="status"></p>
+      </div>
         <figure class="venue-map">
           <div class="venue-map-frame">
-            <img class="venue-map-image" src="./assets/venue-map.png" alt="더블유스퀘어컨벤션 위치와 주변 도로" decoding="async">
+            <a class="venue-map-preview" href="https://map.kakao.com/link/map/W%EC%8A%A4%ED%80%98%EC%96%B4%EC%BB%A8%EB%B2%A4%EC%85%98,37.4006298,127.1114621">
+              <img class="venue-map-image" src="./assets/venue-map.png" alt="W스퀘어컨벤션 위치와 주변 도로">
+              <span class="venue-map-hint">지도에서 위치 보기</span>
+            </a>
             <div class="venue-map-interactive" inert role="region"
-              aria-label="더블유스퀘어컨벤션 지도" data-venue="더블유스퀘어컨벤션"
+              aria-label="W스퀘어컨벤션 지도" data-venue="W스퀘어컨벤션"
               data-latitude="37.4006298" data-longitude="127.1114621"></div>
+            <span class="venue-map-hint venue-map-gesture" aria-hidden="true">지도를 눌러 움직일 수 있어요</span>
           </div>
-          <p class="venue-map-hint">한 손가락으로 지도를 움직이고, 두 손가락으로 확대·축소할 수 있어요.</p>
           <figcaption><a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a></figcaption>
         </figure>
         <div class="directions-actions">
-          <a class="directions-link" href="https://map.naver.com/p/entry/place/36301790" data-naver-query="dlat=37.4006298&amp;dlng=127.1114621&amp;dname=%EB%8D%94%EB%B8%94%EC%9C%A0%EC%8A%A4%ED%80%98%EC%96%B4%EC%BB%A8%EB%B2%A4%EC%85%98">네이버 지도</a>
-          <a class="directions-link" href="https://map.kakao.com/link/to/%EB%8D%94%EB%B8%94%EC%9C%A0%EC%8A%A4%ED%80%98%EC%96%B4%EC%BB%A8%EB%B2%A4%EC%85%98,37.4006298,127.1114621">카카오맵</a>
-          <a class="directions-link" href="https://tmap.life/0ffb7f67">T맵</a>
+          <a class="directions-link" href="https://map.naver.com/p/entry/place/36301790" data-naver-query="dlat=37.4006298&amp;dlng=127.1114621&amp;dname=W%EC%8A%A4%ED%80%98%EC%96%B4%EC%BB%A8%EB%B2%A4%EC%85%98">네이버지도</a>
+          <a class="directions-link" href="https://tmap.life/0ffb7f67">T MAP</a>
+          <a class="directions-link" href="https://map.kakao.com/link/to/W%EC%8A%A4%ED%80%98%EC%96%B4%EC%BB%A8%EB%B2%A4%EC%85%98,37.4006298,127.1114621">카카오맵</a>
         </div>
-      </section>
-      <dl class="transport">
-        <div><dt>주차</dt><dd class="transport-description">웨딩홀 2시간 무료주차인근 주차타워(삼환하이펙스 B동) 무료주차(주차요원 안내 예정)</dd></div>
-        <div><dt>셔틀</dt><dd><span class="transport-description">판교역 1번 출구 앞
-약 10분 간격 수시운행</span>
+      <div class="transport">
+        <details class="transport-details">
+          <summary>지하철 이용 시</summary>
+          <p class="transport-description"><a href="https://map.naver.com/p/entry/place/36301790">네이버지도에서 지하철 길찾기</a></p>
+        </details>
+        <details class="transport-details">
+          <summary>자차 이용 시</summary>
+          <p class="transport-description"><a href="https://map.naver.com/p/entry/place/36301790">네이버지도에서 자동차 길찾기</a></p>
+        </details>
+        <details class="transport-details">
+          <summary>버스 이용 시</summary>
+          <p class="transport-description"><a href="https://map.naver.com/p/entry/place/36301790">네이버지도에서 버스 길찾기</a></p>
+        </details>
+        <details class="transport-details"><summary>셔틀버스</summary>
+          <p class="transport-description">판교역 1번 출구 앞
+약 10분 간격 수시운행</p>
+
           <details class="shuttle-photo">
             <summary>탑승지 사진 보기</summary>
             <img src="./assets/shuttle-stop.jpg" alt="셔틀 탑승 장소" loading="lazy" decoding="async">
           </details>
-        </dd></div>
-      </dl>
-    </section>
-
-    <section class="section thanks" aria-labelledby="thanks-title">
-      <h2 id="thanks-title">축하의 마음</h2>
-      <p>저희의 시작을 따뜻하게 지켜봐 주셔서 감사합니다.<br>
-        보내주신 축복을 오래도록 마음에 간직하겠습니다.</p>
+                </details>
+        <details class="transport-details"><summary>주차 안내</summary>
+          <p class="transport-description">웨딩홀 2시간 무료주차
+인근 주차타워(삼환하이펙스 B동) 무료주차(주차요원 안내 예정)</p>
+        </details>
+      </div>
     </section>
 
     <section class="section contacts" aria-labelledby="contacts-title">
-      <h2 id="contacts-title">마음 전하실 곳</h2>
-      <p class="contacts-message">따뜻한 마음으로 저희의 시작을 응원해 주셔서 감사합니다.</p>
-      <div class="contact-panels">
+      <details class="contact-disclosure">
+        <summary id="contacts-title" class="contact-heading">마음 전하실 곳</summary>
+        <div class="contact-panels">
         <details class="contact-details">
           <summary>신랑 측</summary>
           <div class="contact-card">
@@ -180,13 +210,18 @@
             <p class="contact-account">신한은행 1000-1234-5678<br><span>예금주 김민아</span></p>
           </div>
         </details>
-      </div>
+        </div>
+      </details>
+      <p class="contacts-message">멀리서도 축하의 마음을<br>전하고 싶으신 분들을 위해<br>계좌번호를 안내드립니다.</p>
+      <p class="contacts-message">소중한 축하를 보내주셔서 감사드리며,<br>따뜻한 마음에 깊이 감사드립니다.</p>
     </section>
 
     <footer class="share" hidden>
       <button type="button" class="share-button">
-        <span class="share-icon" aria-hidden="true"></span>
-        청첩장 공유하기
+        <span class="share-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3m-4.5 4.5L12 3l4.5 4.5M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6"/></svg>
+        </span>
+        공유하기
       </button>
       <p class="share-status" role="status"></p>
       <label class="share-link" hidden>

@@ -1,6 +1,6 @@
 {
   "status": "confirmed",
-  "background_color": "#f8f6f0",
+  "background_color": "#fdfdfd",
   "groom_name": "김병남",
   "groom_phone": "010-2699-5627",
   "groom_account": {
@@ -21,11 +21,11 @@
   "bride_mother_name": "이수경",
   "date": "2027-03-27",
   "time": "14:30",
-  "venue_name": "더블유스퀘어컨벤션",
+  "venue_name": "W스퀘어컨벤션",
   "venue_address": "경기도 성남시 분당구 판교역로226번길 16",
-  "venue_hall": "그레이스 홀",
+  "venue_hall": "그레이스홀",
   "venue_floor": "L층",
-  "parking": "웨딩홀 2시간 무료주차인근 주차타워(삼환하이펙스 B동) 무료주차(주차요원 안내 예정)",
+  "parking": "웨딩홀 2시간 무료주차\n인근 주차타워(삼환하이펙스 B동) 무료주차(주차요원 안내 예정)",
   "shuttle": "판교역 1번 출구 앞\n약 10분 간격 수시운행",
   "shuttle_photo": "assets/shuttle-stop.jpg",
   "directions": {
@@ -35,6 +35,24 @@
     "naver_place_url": "https://map.naver.com/p/entry/place/36301790",
     "tmap_place_url": "https://tmap.life/0ffb7f67"
   },
-  "cover_photo": "assets/gallery/HE_01466-1.jpg",
-  "cover_photo_alt": "커버 사진"
+  "cover_photo": "assets/cover.webp",
+  "cover_photo_alt": "베일 아래에서 바라보며 웃는 신랑과 신부",
+  "gallery_order": [
+    "assets/gallery/01.webp",
+    "assets/gallery/02.webp",
+    "assets/gallery/03.webp",
+    "assets/gallery/04.webp",
+    "assets/gallery/05.webp",
+    "assets/gallery/06.webp",
+    "assets/gallery/07.webp",
+    "assets/gallery/08.webp",
+    "assets/gallery/09.webp",
+    "assets/gallery/10.webp",
+    "assets/gallery/11.webp",
+    "assets/gallery/12.webp",
+    "assets/gallery/13.webp",
+    "assets/gallery/14.webp",
+    "assets/gallery/15.webp",
+    "assets/gallery/16.webp"
+  ]
 }
